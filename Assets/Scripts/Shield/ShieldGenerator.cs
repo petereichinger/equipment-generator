@@ -29,7 +29,7 @@ namespace EquipmentGenerator.Shield {
 			float size = Random.Range(minRadius, maxRadius);
 			float thick = Random.Range(minThickness, maxThickness);
 
-			var values = GenerateFullShield(size, thick);
+			var values = GenerateFullShield(size, thick, true, false, true);
 
 			mesh.SetVertices(values.Vertices);
 			mesh.subMeshCount = values.SubMeshes.Count;
@@ -39,7 +39,7 @@ namespace EquipmentGenerator.Shield {
 			return mesh;
 		}
 
-		private ShieldValues GenerateFullShield(float size, float thick) {
+		private ShieldValues GenerateFullShield(float size, float thick, bool front = true, bool back = true, bool outside = true) {
 			var values = new ShieldValues();
 			Vector3[] vertices = new Vector3[2 * (roundVertices + 1)];
 			// Center vertices for front and back
@@ -61,29 +61,42 @@ namespace EquipmentGenerator.Shield {
 				var back1 = roundVertices + i + 2;
 				var back2 = roundVertices + Math.Mod(i + 1, roundVertices) + 2;
 
-				// Triangles of front
-				frontIndices.Add(0);
-				frontIndices.Add(front1);
-				frontIndices.Add(front2);
+				if (front) {
+					// Triangles of front
+					frontIndices.Add(0);
+					frontIndices.Add(front1);
+					frontIndices.Add(front2);
+				}
 
-				// Triangles of back
-				backIndices.Add(roundVertices + 1);
-				backIndices.Add(back1);
-				backIndices.Add(back2);
+				if (back) {
+					// Triangles of back
+					backIndices.Add(roundVertices + 1);
+					backIndices.Add(back1);
+					backIndices.Add(back2);
+				}
 
-				// Triangles of ouside
-				outsideIndices.Add(front2);
-				outsideIndices.Add(front1);
-				outsideIndices.Add(back2);
+				if (outside) {
+					// Triangles of ouside
+					outsideIndices.Add(front2);
+					outsideIndices.Add(front1);
+					outsideIndices.Add(back2);
 
-				outsideIndices.Add(front2);
-				outsideIndices.Add(back2);
-				outsideIndices.Add(back1);
+					outsideIndices.Add(front2);
+					outsideIndices.Add(back2);
+					outsideIndices.Add(back1);
+				}
 			}
 			values.Vertices.AddRange(vertices);
-			values.SubMeshes.Add(frontIndices);
-			values.SubMeshes.Add(backIndices);
-			values.SubMeshes.Add(outsideIndices);
+
+			if (front) {
+				values.SubMeshes.Add(frontIndices);
+			}
+			if (back) {
+				values.SubMeshes.Add(backIndices);
+			}
+			if (outside) {
+				values.SubMeshes.Add(outsideIndices);
+			}
 			return values;
 		}
 	}
