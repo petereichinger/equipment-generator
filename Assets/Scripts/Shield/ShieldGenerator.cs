@@ -30,11 +30,12 @@ namespace EquipmentGenerator.Shield {
 		public float maxRadius = 1.5f;
 		public float minThickness = 0.05f;
 		public float maxThickness = 0.15f;
-		public float centerChance = 0.5f;
-		public float centerMinRadius = .05f;
-		public float centerMaxRadius = .15f;
-		public float centerMinThickness = 0.005f;
-		public float centerMaxThickness = 0.02f;
+		public float bossChance = 0.5f;
+		public float bossPrismChance = 0.9f;
+		public float bossMinRadius = .05f;
+		public float bossMaxRadius = .15f;
+		public float bossMinThickness = 0.005f;
+		public float bossMaxThickness = 0.02f;
 
 		public Mesh Generate(int seed) {
 			Random.seed = seed;
@@ -43,19 +44,21 @@ namespace EquipmentGenerator.Shield {
 			float thick = Random.Range(minThickness, maxThickness);
 
 			List<ShieldValues> shieldParts = new List<ShieldValues>();
-			shieldParts.Add(GenerateFullShield(size, thick));
+			shieldParts.Add(GenerateShieldPart(size, thick));
 
-			if (Random.value < centerChance) {
-				float centerSize = Random.Range(centerMinRadius, centerMaxRadius);
-				float centerThick = Random.Range(centerMinThickness, centerMaxThickness);
-				shieldParts.Add(GenerateFullShield(new Vector3(0, 0, -thick), centerSize, centerThick, true, false, true));
+			if (Random.value < bossChance) {
+				float centerSize = Random.Range(bossMinRadius, bossMaxRadius);
+				float centerThick = Random.Range(bossMinThickness, bossMaxThickness);
+				bool prism = Random.value < bossPrismChance;
+				shieldParts.Add(GenerateShieldPart(new Vector3(0, 0, -thick - centerThick), centerSize, centerThick, prism, false));
 			}
 
 			return BuildMesh(shieldParts);
-			// mesh.SetVertices(values.Vertices); mesh.subMeshCount = values.SubMeshes.Count; for (int i = 0; i <
-			// values.SubMeshes.Count; i++) { mesh.SetTriangles(values.SubMeshes[i], i); } return mesh;
 		}
 
+		/// <summary>Build a mesh from multiple shield parts.</summary>
+		/// <param name="shieldParts">A list of shield parts.</param>
+		/// <returns>A mesh representing the shield.</returns>
 		private Mesh BuildMesh(List<ShieldValues> shieldParts) {
 			int offset = 0;
 			int subMeshOffset = 0;
@@ -83,12 +86,9 @@ namespace EquipmentGenerator.Shield {
 		/// <param name="offset">Offset for the shield.</param>
 		/// <param name="size">Radius of the shield.</param>
 		/// <param name="thick">Thickness of the shield.</param>
-		/// <param name="front"><c>true</c> if front of shield should be created, <c>false</c> otherwise.</param>
 		/// <param name="back"><c>true</c> if back of shield should be created, <c>false</c> otherwise.</param>
-		/// <param name="outside"><c>true</c> if outside of shield should be created, <c>false</c> otherwise.</param>
 		/// <returns><see cref="ShieldValues"/> with Vertices and SubMesh lists of the shield.</returns>
-		private ShieldValues GenerateFullShield(Vector3 offset, float size, float thick, bool front = true, bool back = true,
-			bool outside = true) {
+		private ShieldValues GenerateShieldPart(Vector3 offset, float size, float thick, bool prism = false, bool back = true) {
 			var values = new ShieldValues();
 			Vector3[] vertices = new Vector3[2 * (roundVertices + 1)];
 			// Center vertices for front and back
@@ -110,13 +110,17 @@ namespace EquipmentGenerator.Shield {
 				var back1 = roundVertices + i + 2;
 				var back2 = roundVertices + Math.Mod(i + 1, roundVertices) + 2;
 
-				if (front) {
-					// Triangles of front
+				if (prism) {
+					// Prism shield;
+					frontIndices.Add(0);
+					frontIndices.Add(back2);
+					frontIndices.Add(back1);
+				} else {
+					//Cylinder Shield
 					frontIndices.Add(0);
 					frontIndices.Add(front1);
 					frontIndices.Add(front2);
 				}
-
 				if (back) {
 					// Triangles of back
 					backIndices.Add(roundVertices + 1);
@@ -124,7 +128,7 @@ namespace EquipmentGenerator.Shield {
 					backIndices.Add(back2);
 				}
 
-				if (outside) {
+				if (!prism) {
 					// Triangles of ouside
 					outsideIndices.Add(front2);
 					outsideIndices.Add(front1);
@@ -137,13 +141,12 @@ namespace EquipmentGenerator.Shield {
 			}
 			values.Vertices.AddRange(vertices);
 
-			if (front) {
-				values.SubMeshes.Add(frontIndices);
-			}
+			values.SubMeshes.Add(frontIndices);
+
 			if (back) {
 				values.SubMeshes.Add(backIndices);
 			}
-			if (outside) {
+			if (!prism) {
 				values.SubMeshes.Add(outsideIndices);
 			}
 			return values;
@@ -152,12 +155,10 @@ namespace EquipmentGenerator.Shield {
 		/// <summary>Generate a shield without offset.</summary>
 		/// <param name="size">Radius of the shield.</param>
 		/// <param name="thick">Thickness of the shield.</param>
-		/// <param name="front"><c>true</c> if front of shield should be created, <c>false</c> otherwise.</param>
 		/// <param name="back"><c>true</c> if back of shield should be created, <c>false</c> otherwise.</param>
-		/// <param name="outside"><c>true</c> if outside of shield should be created, <c>false</c> otherwise.</param>
 		/// <returns><see cref="ShieldValues"/> with Vertices and SubMesh lists of the shield.</returns>
-		private ShieldValues GenerateFullShield(float size, float thick, bool front = true, bool back = true, bool outside = true) {
-			return GenerateFullShield(Vector3.zero, size, thick, front, back, outside);
+		private ShieldValues GenerateShieldPart(float size, float thick, bool prism = false, bool back = true) {
+			return GenerateShieldPart(Vector3.zero, size, thick, prism, back);
 		}
 	}
 }
