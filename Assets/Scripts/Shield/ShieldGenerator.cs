@@ -5,6 +5,17 @@ using UnityEngine;
 namespace EquipmentGenerator.Shield {
 
 	public class ShieldGenerator : IGenerator {
+
+		private class ShieldValues {
+			public List<Vector3> Vertices { get; set; }
+			public List<List<int>> SubMeshes { get; set; }
+
+			public ShieldValues() {
+				Vertices = new List<Vector3>();
+				SubMeshes = new List<List<int>>();
+			}
+		}
+
 		public int roundVertices = 16;
 		public float minRadius = .75f;
 		public float maxRadius = 1.5f;
@@ -17,6 +28,19 @@ namespace EquipmentGenerator.Shield {
 			// Random radius and thickness
 			float size = Random.Range(minRadius, maxRadius);
 			float thick = Random.Range(minThickness, maxThickness);
+
+			var values = GenerateFullShield(size, thick);
+
+			mesh.SetVertices(values.Vertices);
+			mesh.subMeshCount = values.SubMeshes.Count;
+			for (int i = 0; i < values.SubMeshes.Count; i++) {
+				mesh.SetTriangles(values.SubMeshes[i], i);
+			}
+			return mesh;
+		}
+
+		private ShieldValues GenerateFullShield(float size, float thick) {
+			var values = new ShieldValues();
 			Vector3[] vertices = new Vector3[2 * (roundVertices + 1)];
 			// Center vertices for front and back
 			vertices[0] = new Vector3(0, 0, -thick);
@@ -26,41 +50,41 @@ namespace EquipmentGenerator.Shield {
 				vertices[i + 1] = new Vector3(size * Mathf.Cos(angle), size * Mathf.Sin(angle), -thick);
 				vertices[i + roundVertices + 2] = new Vector3(size * Mathf.Cos(angle), size * Mathf.Sin(angle), thick);
 			}
-			int[] triIndices = new int[4 * roundVertices * 3];
+
+			List<int> frontIndices = new List<int>();
+			List<int> backIndices = new List<int>();
+			List<int> outsideIndices = new List<int>();
 
 			for (int i = 0; i < roundVertices; i++) {
-				int idxFront = i * 3;
-				int idxBack = (i + roundVertices) * 3;
-				int idxOutside = 2 * (i + roundVertices) * 3;
 				var front1 = Math.Mod(i + 1, roundVertices) + 1;
 				var front2 = i + 1;
 				var back1 = roundVertices + i + 2;
 				var back2 = roundVertices + Math.Mod(i + 1, roundVertices) + 2;
 
 				// Triangles of front
-				triIndices[idxFront] = 0;
-				triIndices[idxFront + 1] = front1;
-				triIndices[idxFront + 2] = front2;
+				frontIndices.Add(0);
+				frontIndices.Add(front1);
+				frontIndices.Add(front2);
 
 				// Triangles of back
-				triIndices[idxBack] = roundVertices + 1;
-				triIndices[idxBack + 1] = back1;
-				triIndices[idxBack + 2] = back2;
+				backIndices.Add(roundVertices + 1);
+				backIndices.Add(back1);
+				backIndices.Add(back2);
 
 				// Triangles of ouside
-				triIndices[idxOutside] = front2;
-				triIndices[idxOutside + 1] = front1;
-				triIndices[idxOutside + 2] = back2;
+				outsideIndices.Add(front2);
+				outsideIndices.Add(front1);
+				outsideIndices.Add(back2);
 
-				triIndices[idxOutside + 3] = front2;
-				triIndices[idxOutside + 5] = back1;
-				triIndices[idxOutside + 4] = back2;
+				outsideIndices.Add(front2);
+				outsideIndices.Add(back2);
+				outsideIndices.Add(back1);
 			}
-
-			mesh.vertices = vertices;
-			mesh.triangles = triIndices;
-
-			return mesh;
+			values.Vertices.AddRange(vertices);
+			values.SubMeshes.Add(frontIndices);
+			values.SubMeshes.Add(backIndices);
+			values.SubMeshes.Add(outsideIndices);
+			return values;
 		}
 	}
 }
