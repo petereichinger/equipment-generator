@@ -54,14 +54,20 @@ public class FunctionMeshGenerator {
 			int offsetNew = offsetOld + oldPoints.Count;
 
 			if (oldPoints.Count > 0) {
-				if (oldPoints.Count == 2) {
+				if (newPoints.Count == 2) {
+					if (oldPoints.Count == 2) {
+						triangleIndices.Add(offsetOld);
+						triangleIndices.Add(offsetOld + 1);
+						triangleIndices.Add(offsetNew + 1);
+					}
+					triangleIndices.Add(offsetOld);
+					triangleIndices.Add(offsetNew + 1);
+					triangleIndices.Add(offsetNew);
+				} else {
 					triangleIndices.Add(offsetOld);
 					triangleIndices.Add(offsetOld + 1);
-					triangleIndices.Add(offsetNew + 1);
+					triangleIndices.Add(offsetNew);
 				}
-				triangleIndices.Add(offsetOld);
-				triangleIndices.Add(offsetNew + 1);
-				triangleIndices.Add(offsetNew);
 			}
 
 			points.AddRange(oldPoints);
