@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FunctionMeshGenerator {
 
-	public Mesh Generate(System.Func<float, float> function, int resolution) {
+	public Mesh Generate(System.Func<float, Vector3> function, int resolution) {
 		var mesh = new Mesh();
 
 		List<Vector3> points = new List<Vector3>(resolution * 2 + 1);
@@ -14,10 +14,10 @@ public class FunctionMeshGenerator {
 		List<Vector3> newPoints = new List<Vector3>(3);
 		List<Vector3> oldPoints = new List<Vector3>(3);
 
-		float minY = function(0f);
+		float minY = function(0f).y;
 
 		for (int i = 0; i < resolution; i++) {
-			float val = function((float)i / resolution);
+			float val = function((float)i / resolution).y;
 			if (val < minY) {
 				minY = val;
 			}
@@ -25,13 +25,13 @@ public class FunctionMeshGenerator {
 
 		for (int i = 0; i <= resolution; i++) {
 			float x = (float)i / resolution;
-			float y = function(x);
+			Vector3 value = function(x);
 
 			newPoints.Clear();
 
-			newPoints.Add(new Vector3(x, minY));
-			if (y > minY) {
-				newPoints.Add(new Vector3(x, y));
+			newPoints.Add(new Vector3(x, minY, value.z));
+			if (value.y > minY) {
+				newPoints.Add(value);
 			}
 
 			int offsetOld = points.Count;
