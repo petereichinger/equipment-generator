@@ -15,18 +15,27 @@ public class FunctionMeshGenerator {
 		List<Vector3> oldPoints = new List<Vector3>(3);
 
 		float minY = function(0f).y;
+		float maxY = function(0f).y;
+		float minZ = function(0f).z;
 
 		for (int i = 0; i < resolution; i++) {
-			float val = function((float)i / resolution).y;
-			if (val < minY) {
-				minY = val;
+			Vector3 val = function((float)i / resolution);
+			if (val.y < minY) {
+				minY = val.y;
+			}
+			if (val.y > maxY) {
+				maxY = val.y;
+			}
+			if (val.z < minZ) {
+				minZ = val.z;
 			}
 		}
 
 		for (int i = 0; i <= resolution; i++) {
 			float x = (float)i / resolution;
 			Vector3 value = function(x);
-
+			float normalizedZ = value.z - minZ;
+			value.z = normalizedZ;
 			newPoints.Clear();
 
 			if (!invert) {
