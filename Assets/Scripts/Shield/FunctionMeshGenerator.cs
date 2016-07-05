@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 public class FunctionMeshGenerator {
@@ -12,13 +13,24 @@ public class FunctionMeshGenerator {
 
 		List<Vector3> newPoints = new List<Vector3>(3);
 		List<Vector3> oldPoints = new List<Vector3>(3);
+
+		float minY = function(0f);
+
+		for (int i = 0; i < resolution; i++) {
+			float val = function((float)i / resolution);
+			if (val < minY) {
+				minY = val;
+			}
+		}
+
 		for (int i = 0; i <= resolution; i++) {
 			float x = (float)i / resolution;
 			float y = function(x);
 
 			newPoints.Clear();
-			newPoints.Add(new Vector3(x, 0));
-			if (y > 0f) {
+
+			newPoints.Add(new Vector3(x, minY));
+			if (y > minY) {
 				newPoints.Add(new Vector3(x, y));
 			}
 
