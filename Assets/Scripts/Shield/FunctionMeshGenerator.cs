@@ -3,47 +3,72 @@ using UnityEngine;
 
 public class FunctionMeshGenerator {
 
-	public Mesh Generate(System.Func<float, float> function, int resolution, Vector2 scale, bool invert = false, float radius = 0f, float offset = 0f) {
+	public interface IPointSource {
+		int Resolution { get; }
+
+		void GetNextPoints(float fraction, List<Vector3> nextPointsList);
+	}
+
+	public class FunctionPointSource : IPointSource {
+		public int Resolution { get; private set; }
+
+		private System.Func<float, float> _function;
+		private float _minY;
+		private float _maxY;
+		private bool _inverted;
+
+		public void GetNextPoints(float fraction, List<Vector3> nextPointsList) {
+			float x = fraction;
+			float value = _function(x);
+
+			if (!_inverted) {
+				nextPointsList.Add(new Vector3(x, _minY, 0));
+				if (value > _minY) {
+					nextPointsList.Add(new Vector3(x, value, 0));
+				}
+			} else {
+				if (value < _maxY) {
+					nextPointsList.Add(new Vector3(x, value, 0));
+				}
+				nextPointsList.Add(new Vector3(x, _maxY, 0));
+			}
+		}
+
+		public FunctionPointSource(System.Func<float, float> function, int resolution, bool inverted = false) {
+			Resolution = resolution;
+			_function = function;
+			_inverted = inverted;
+			_minY = _function(0f);
+			_maxY = _function(0f);
+
+			for (int i = 0; i < resolution; i++) {
+				float val = _function((float)i / resolution);
+				if (val < _minY) {
+					_minY = val;
+				}
+				if (val > _maxY) {
+					_maxY = val;
+				}
+			}
+		}
+	}
+
+	public Mesh Generate(IPointSource pointSource, Vector2 scale, float radius = 0f, float offset = 0f) {
 		var mesh = new Mesh();
 
 		float sqrRadius = Mathf.Pow(radius, 2);
 
-		List<Vector3> points = new List<Vector3>(resolution * 2 + 1);
+		List<Vector3> points = new List<Vector3>(pointSource.Resolution * 2 + 1);
 
 		List<int> triangleIndices = new List<int>();
 
 		List<Vector3> newPoints = new List<Vector3>(3);
 		List<Vector3> oldPoints = new List<Vector3>(3);
 
-		float minY = function(0f);
-		float maxY = function(0f);
-
-		for (int i = 0; i < resolution; i++) {
-			float val = function((float)i / resolution);
-			if (val < minY) {
-				minY = val;
-			}
-			if (val > maxY) {
-				maxY = val;
-			}
-		}
-
-		for (int i = 0; i <= resolution; i++) {
-			float x = (float)i / resolution;
-			float value = function(x);
+		for (int i = 0; i <= pointSource.Resolution; i++) {
 			newPoints.Clear();
 
-			if (!invert) {
-				newPoints.Add(new Vector3(x, minY, 0));
-				if (value > minY) {
-					newPoints.Add(new Vector3(x, value, 0));
-				}
-			} else {
-				if (value < maxY) {
-					newPoints.Add(new Vector3(x, value, 0));
-				}
-				newPoints.Add(new Vector3(x, maxY, 0));
-			}
+			pointSource.GetNextPoints((float)i / pointSource.Resolution, newPoints);
 
 			int offsetOld = points.Count;
 			int offsetNew = offsetOld + oldPoints.Count;
