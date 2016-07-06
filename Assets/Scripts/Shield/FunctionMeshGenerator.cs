@@ -88,6 +88,19 @@ public class FunctionMeshGenerator {
 		}
 	}
 
+	public class SquarePointSource : IPointSource {
+		public int Resolution { get; private set; }
+
+		public void GetNextPoints(float fraction, List<Vector3> nextPointsList) {
+			nextPointsList.Add(new Vector3(fraction, 0));
+			nextPointsList.Add(new Vector3(fraction, 1));
+		}
+
+		public SquarePointSource(int resolution) {
+			Resolution = resolution;
+		}
+	}
+
 	public Mesh Generate(IPointSource pointSource, Vector2 scale, float radius = 0f, float offset = 0f) {
 		var mesh = new Mesh();
 
