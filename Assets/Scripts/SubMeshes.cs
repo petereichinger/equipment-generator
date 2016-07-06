@@ -9,8 +9,12 @@ namespace EquipmentGenerator {
 	/// meshes into a <see cref="Mesh"/>.
 	/// </summary>
 	public class SubMesh {
-		private List<Vector3> _vertices;
-		private List<int> _triangles;
+
+		/// <summary>The vertices of this submesh.</summary>
+		private readonly List<Vector3> _vertices;
+
+		/// <summary>The triangle indices of this submesh.</summary>
+		private readonly List<int> _triangles;
 
 		/// <summary>Create a new sub mesh with the specified vertices and triangles.</summary>
 		/// <param name="vertices">A list of vertices.</param>
@@ -63,6 +67,7 @@ namespace EquipmentGenerator {
 				mesh.SetTriangles(triangles, 0);
 			} else {
 				mesh.subMeshCount = subMeshTriangles.Count;
+
 				for (int i = 0; i < subMeshTriangles.Count; i++) {
 					mesh.SetTriangles(subMeshTriangles[i], i);
 				}
