@@ -17,19 +17,24 @@ namespace EquipmentGenerator.Shield {
 		public float offset = 0.5f;
 
 		public Vector2 scale = Vector2.one;
-		public bool invert = false;
+		// public bool invert = false;
 
 		public AnimationCurve curve;
+		public AnimationCurve curveBottom;
 
 		public void GenerateShield() {
 			// var newShield = new ShieldGenerator().Generate(System.Environment.TickCount);
 
-			var top = new FunctionMeshGenerator().Generate(new FunctionPointSource(x => curve.Evaluate(x), res, invert), scale, radius, offset);
+			var top = new FunctionMeshGenerator().Generate(new FunctionPointSource(x => curve.Evaluate(x), res), scale, radius, offset);
 			var middle = new FunctionMeshGenerator().Generate(new SquarePointSource(res), scale, radius, offset);
+			var bottom = new FunctionMeshGenerator().Generate(new FunctionPointSource(x => curveBottom.Evaluate(x), res, true), scale,
+				radius, offset);
 			var subMeshes = new List<SubMesh>();
 			subMeshes.Add(top);
 			subMeshes.Add(middle);
+			subMeshes.Add(bottom);
 			middle.Modify(v => v += Vector3.down * scale.y);
+			bottom.Modify(v => v += Vector3.down * scale.y * 2f);
 			var mesh = SubMesh.Combine(subMeshes);
 
 			var meshFilter = GetComponent<MeshFilter>();
