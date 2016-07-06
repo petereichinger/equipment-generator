@@ -8,9 +8,10 @@ namespace EquipmentGenerator.Shield.Editor {
 	public class ShieldGeneratorComponentEditor : UnityEditor.Editor {
 
 		public override void OnInspectorGUI() {
+			EditorGUI.BeginChangeCheck();
 			base.OnInspectorGUI();
 
-			if (GUILayout.Button("Generate")) {
+			if (EditorGUI.EndChangeCheck()) {
 				((ShieldGeneratorComponent)target).GenerateShield();
 			}
 		}
