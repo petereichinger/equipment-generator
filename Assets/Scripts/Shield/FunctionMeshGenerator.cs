@@ -3,8 +3,10 @@ using UnityEngine;
 
 public class FunctionMeshGenerator {
 
-	public Mesh Generate(System.Func<float, float> function, int resolution, Vector2 scale, bool invert = false) {
+	public Mesh Generate(System.Func<float, float> function, int resolution, Vector2 scale, bool invert = false, float radius = 0f) {
 		var mesh = new Mesh();
+
+		float sqrRadius = Mathf.Pow(radius, 2);
 
 		List<Vector3> points = new List<Vector3>(resolution * 2 + 1);
 
@@ -75,8 +77,15 @@ public class FunctionMeshGenerator {
 		for (int i = 0; i < points.Count; i++) {
 			var point = points[i];
 
+			point.x -= 0.5f;
 			point.Scale(scale);
 
+			float finalX = point.x;
+			float pow = Mathf.Pow(finalX, 2f);
+			if (radius > pow) {
+				float z = -Mathf.Sqrt(sqrRadius - pow);
+				point.z = z + radius;
+			}
 			points[i] = point;
 		}
 
