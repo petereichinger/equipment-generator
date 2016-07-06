@@ -6,9 +6,7 @@ namespace EquipmentGenerator {
 
 	public class FunctionMeshGenerator {
 
-		public Mesh Generate(IPointSource pointSource, Vector2 scale, float radius = 0f, float offset = 0f) {
-			var mesh = new Mesh();
-
+		public SubMesh Generate(IPointSource pointSource, Vector2 scale, float radius = 0f, float offset = 0f) {
 			float sqrRadius = Mathf.Pow(radius, 2);
 
 			List<Vector3> points = new List<Vector3>(pointSource.Resolution * 2 + 1);
@@ -75,13 +73,7 @@ namespace EquipmentGenerator {
 				points[i] = point;
 			}
 
-			mesh.SetVertices(points);
-			mesh.subMeshCount = 1;
-			mesh.SetTriangles(triangleIndices, 0);
-
-			mesh.Optimize();
-
-			return mesh;
+			return new SubMesh(points, triangleIndices);
 		}
 	}
 }
