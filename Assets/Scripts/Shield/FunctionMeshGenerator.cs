@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 public class FunctionMeshGenerator {
 
-	public Mesh Generate(System.Func<float, float> function, int resolution, bool invert = false) {
+	public Mesh Generate(System.Func<float, float> function, int resolution, Vector2 scale, bool invert = false) {
 		var mesh = new Mesh();
 
 		List<Vector3> points = new List<Vector3>(resolution * 2 + 1);
@@ -70,6 +69,16 @@ public class FunctionMeshGenerator {
 		}
 
 		points.AddRange(newPoints);
+
+		// Scale and move points
+
+		for (int i = 0; i < points.Count; i++) {
+			var point = points[i];
+
+			point.Scale(scale);
+
+			points[i] = point;
+		}
 
 		mesh.SetVertices(points);
 		mesh.subMeshCount = 1;
