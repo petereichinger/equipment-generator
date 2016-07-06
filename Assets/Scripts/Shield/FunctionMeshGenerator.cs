@@ -1,22 +1,53 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class FunctionMeshGenerator {
 
+	/// <summary>
+	/// Interface for a point source that can be used in <see cref="Generate"/>. Point sources always operate in the
+	/// range [0:1].
+	/// </summary>
 	public interface IPointSource {
+
+		/// <summary>
+		/// Resolution of this point source. This is the number of cells that will be created in the horizontal.
+		/// </summary>
 		int Resolution { get; }
 
+		/// <summary>Get the points for a certain fraction.</summary>
+		/// <param name="fraction">Fraction.</param>
+		/// <param name="nextPointsList">
+		/// List where the next points should be stored. This list should be cleared by the caller before calling this
+		/// method.
+		/// </param>
 		void GetNextPoints(float fraction, List<Vector3> nextPointsList);
 	}
 
+	/// <summary>
+	/// Point source that uses a <see cref="Func{T,TResult}"/> with ( <see cref="float"/> as generic parameters).
+	/// </summary>
 	public class FunctionPointSource : IPointSource {
 		public int Resolution { get; private set; }
 
-		private System.Func<float, float> _function;
-		private float _minY;
-		private float _maxY;
-		private bool _inverted;
+		/// <summary>Function that is evaluated.</summary>
+		private readonly System.Func<float, float> _function;
 
+		/// <summary>Minimum Y value.</summary>
+		private readonly float _minY;
+
+		/// <summary>Maximum Y value.</summary>
+		private readonly float _maxY;
+
+		/// <summary>
+		/// Flag that indicates wether points from minimum y to the function value should be created or from the function
+		/// value to the maximum y value.
+		/// </summary>
+		private readonly bool _inverted;
+
+		/// <summary>Get the next points with the function.</summary>
+		/// <param name="fraction">Fraction.</param>
+		/// <param name="nextPointsList">List where the new points are stored.</param>
 		public void GetNextPoints(float fraction, List<Vector3> nextPointsList) {
 			float x = fraction;
 			float value = _function(x);
@@ -34,6 +65,10 @@ public class FunctionMeshGenerator {
 			}
 		}
 
+		/// <summary>Create a new instance of this point source.</summary>
+		/// <param name="function">Function to use.</param>
+		/// <param name="resolution">Resolution.</param>
+		/// <param name="inverted">True if should be inverted or not.</param>
 		public FunctionPointSource(System.Func<float, float> function, int resolution, bool inverted = false) {
 			Resolution = resolution;
 			_function = function;
