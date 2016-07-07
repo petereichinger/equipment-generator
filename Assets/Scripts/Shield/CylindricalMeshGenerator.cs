@@ -6,15 +6,14 @@ namespace EquipmentGenerator {
 
 	public class CylindricalMeshGenerator {
 
-		public static SubMesh Generate(IPointSource pointSource, Vector2 scale, float radius = 0f, float offset = 0f) {
+		public static SubMesh Generate(IPointSource pointSource, Vector2 scale, float radius = 1f, float offset = 0f, bool flip = false) {
 			float sqrRadius = Mathf.Pow(radius, 2);
 
 			List<Vector3> points = new List<Vector3>(pointSource.Resolution * 2 + 1);
-
 			List<int> triangleIndices = new List<int>();
 
-			List<Vector3> newPoints = new List<Vector3>(3);
-			List<Vector3> oldPoints = new List<Vector3>(3);
+			List<Vector2> newPoints = new List<Vector2>(3);
+			List<Vector2> oldPoints = new List<Vector2>(3);
 
 			for (int i = 0; i <= pointSource.Resolution; i++) {
 				newPoints.Clear();
@@ -27,26 +26,20 @@ namespace EquipmentGenerator {
 				if (oldPoints.Count > 0) {
 					if (newPoints.Count == 2) {
 						if (oldPoints.Count == 2) {
-							triangleIndices.Add(offsetOld);
-							triangleIndices.Add(offsetOld + 1);
-							triangleIndices.Add(offsetNew + 1);
+							triangleIndices.AddTriangle(offsetOld, offsetOld + 1, offsetNew + 1, flip);
 						}
-						triangleIndices.Add(offsetOld);
-						triangleIndices.Add(offsetNew + 1);
-						triangleIndices.Add(offsetNew);
+						triangleIndices.AddTriangle(offsetOld, offsetNew + 1, offsetNew, flip);
 					} else {
-						triangleIndices.Add(offsetOld);
-						triangleIndices.Add(offsetOld + 1);
-						triangleIndices.Add(offsetNew);
+						triangleIndices.AddTriangle(offsetOld, offsetOld + 1, offsetNew, flip);
 					}
 				}
 
-				points.AddRange(oldPoints);
+				points.AddPoints(oldPoints);
 				oldPoints.Clear();
 				oldPoints.AddRange(newPoints);
 			}
 
-			points.AddRange(newPoints);
+			points.AddPoints(newPoints);
 
 			// Scale and move points
 			float realWidth;
