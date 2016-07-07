@@ -41,32 +41,39 @@ namespace EquipmentGenerator {
 
 			points.AddPoints(newPoints);
 
+			OverlayOnCylinder(points, scale, radius, offset);
+
+			return new SubMesh(points, triangleIndices);
+		}
+
+		private static void OverlayOnCylinder(List<Vector3> points, Vector2 scale, float radius, float offset) {
 			// Scale and move points
-			float realWidth;
-			if (radius > 0f) {
-				realWidth = radius * Mathf.Deg2Rad * scale.x;
-			} else {
-				realWidth = scale.x;
-			}
-			Vector3 finalScale = new Vector3(realWidth, scale.y);
+
+			// float sqrRadius = Mathf.Pow(radius, 2);
 
 			for (int i = 0; i < points.Count; i++) {
 				var point = points[i];
 
 				point.x -= offset + 0.5f;
 
-				point.Scale(finalScale);
+				float realWidth;
+				if (radius > 0f) {
+					realWidth = (radius - point.z) * Mathf.Deg2Rad * scale.x;
+				} else {
+					realWidth = scale.x;
+				}
+
+				point.Scale(new Vector3(realWidth, scale.y, 1f));
 
 				float finalX = point.x;
 				float pow = Mathf.Pow(finalX, 2f);
-				if (radius > pow) {
+				float sqrRadius = Mathf.Pow(radius - point.z, 2f);
+				if (sqrRadius > pow) {
 					float z = -Mathf.Sqrt(sqrRadius - pow);
 					point.z = z + radius;
 				}
 				points[i] = point;
 			}
-
-			return new SubMesh(points, triangleIndices);
 		}
 	}
 }
