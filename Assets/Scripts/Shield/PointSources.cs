@@ -21,7 +21,7 @@ namespace EquipmentGenerator {
 		/// List where the next points should be stored. This list should be cleared by the caller before calling this
 		/// method.
 		/// </param>
-		void GetNextPoints(float fraction, List<Vector3> nextPointsList);
+		void GetNextPoints(float fraction, List<Vector2> nextPointsList);
 	}
 
 	/// <summary>
@@ -48,20 +48,20 @@ namespace EquipmentGenerator {
 		/// <summary>Get the next points with the function.</summary>
 		/// <param name="fraction">Fraction.</param>
 		/// <param name="nextPointsList">List where the new points are stored.</param>
-		public void GetNextPoints(float fraction, List<Vector3> nextPointsList) {
+		public void GetNextPoints(float fraction, List<Vector2> nextPointsList) {
 			float x = fraction;
 			float value = _function(x);
 
 			if (!_inverted) {
-				nextPointsList.Add(new Vector3(x, _minY, 0));
+				nextPointsList.Add(new Vector2(x, _minY));
 				if (value > _minY) {
-					nextPointsList.Add(new Vector3(x, value, 0));
+					nextPointsList.Add(new Vector2(x, value));
 				}
 			} else {
 				if (value < _maxY) {
-					nextPointsList.Add(new Vector3(x, value, 0));
+					nextPointsList.Add(new Vector2(x, value));
 				}
-				nextPointsList.Add(new Vector3(x, _maxY, 0));
+				nextPointsList.Add(new Vector2(x, _maxY));
 			}
 		}
 
@@ -91,9 +91,9 @@ namespace EquipmentGenerator {
 	public class SquarePointSource : IPointSource {
 		public int Resolution { get; private set; }
 
-		public void GetNextPoints(float fraction, List<Vector3> nextPointsList) {
-			nextPointsList.Add(new Vector3(fraction, 0));
-			nextPointsList.Add(new Vector3(fraction, 1));
+		public void GetNextPoints(float fraction, List<Vector2> nextPointsList) {
+			nextPointsList.Add(new Vector2(fraction, 0));
+			nextPointsList.Add(new Vector2(fraction, 1));
 		}
 
 		public SquarePointSource(int resolution) {
