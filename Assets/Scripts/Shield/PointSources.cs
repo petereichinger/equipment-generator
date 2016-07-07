@@ -32,6 +32,8 @@ namespace EquipmentGenerator {
 		/// </summary>
 		int Resolution { get; }
 
+		bool ZeroOrigin { get; }
+
 		/// <summary>Get the points for a certain fraction.</summary>
 		/// <param name="fraction">Fraction.</param>
 		/// <returns>The value for the specified fraction.</returns>
@@ -43,6 +45,8 @@ namespace EquipmentGenerator {
 	/// </summary>
 	public class FunctionSource : IRangeSource, IPointSource {
 		public int Resolution { get; private set; }
+
+		public bool ZeroOrigin { get { return !_inverted; } }
 
 		/// <summary>Function that is evaluated.</summary>
 		private readonly Func<float, float> _function;
@@ -109,6 +113,8 @@ namespace EquipmentGenerator {
 
 	public class SquareSource : IRangeSource, IPointSource {
 		public int Resolution { get; private set; }
+
+		public bool ZeroOrigin { get { return true; } }
 
 		public Vector2 GetNextPoint(float fraction) {
 			return new Vector2(fraction, 1f);
