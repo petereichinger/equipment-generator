@@ -6,19 +6,19 @@ namespace EquipmentGenerator {
 
 	public class CylindricalMeshGenerator {
 
-		public static SubMesh Generate(IPointSource pointSource, Vector2 scale, float radius = 1f, float offset = 0f, bool flip = false) {
+		public static SubMesh Generate(IRangeSource rangeSource, Vector2 scale, float radius = 1f, float offset = 0f, bool flip = false) {
 			float sqrRadius = Mathf.Pow(radius, 2);
 
-			List<Vector3> points = new List<Vector3>(pointSource.Resolution * 2 + 1);
+			List<Vector3> points = new List<Vector3>(rangeSource.Resolution * 2 + 1);
 			List<int> triangleIndices = new List<int>();
 
 			List<Vector2> newPoints = new List<Vector2>(3);
 			List<Vector2> oldPoints = new List<Vector2>(3);
 
-			for (int i = 0; i <= pointSource.Resolution; i++) {
+			for (int i = 0; i <= rangeSource.Resolution; i++) {
 				newPoints.Clear();
 
-				pointSource.GetNextPoints((float)i / pointSource.Resolution, newPoints);
+				rangeSource.GetNextPoints((float)i / rangeSource.Resolution, newPoints);
 
 				int offsetOld = points.Count;
 				int offsetNew = offsetOld + oldPoints.Count;

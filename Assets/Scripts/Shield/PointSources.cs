@@ -8,7 +8,7 @@ namespace EquipmentGenerator {
 	/// Interface for a point source that can be used in <see cref="CylindricalMeshGenerator.Generate"/>. Point sources
 	/// always operate in the range [0:1].
 	/// </summary>
-	public interface IPointSource {
+	public interface IRangeSource {
 
 		/// <summary>
 		/// Resolution of this point source. This is the number of cells that will be created in the horizontal.
@@ -27,7 +27,7 @@ namespace EquipmentGenerator {
 	/// <summary>
 	/// Point source that uses a <see cref="System.Func{T,TResult}"/> with ( <see cref="float"/> as generic parameters).
 	/// </summary>
-	public class FunctionPointSource : IPointSource {
+	public class FunctionRangeSource : IRangeSource {
 		public int Resolution { get; private set; }
 
 		/// <summary>Function that is evaluated.</summary>
@@ -70,7 +70,7 @@ namespace EquipmentGenerator {
 		/// <param name="function">Function to use.</param>
 		/// <param name="resolution">Resolution.</param>
 		/// <param name="inverted">True if should be inverted or not.</param>
-		public FunctionPointSource(Func<float, float> function, int resolution, bool inverted = false) {
+		public FunctionRangeSource(Func<float, float> function, int resolution, bool inverted = false) {
 			Resolution = resolution;
 			_function = function;
 			_inverted = inverted;
@@ -89,7 +89,7 @@ namespace EquipmentGenerator {
 		}
 	}
 
-	public class SquarePointSource : IPointSource {
+	public class SquareRangeSource : IRangeSource {
 		public int Resolution { get; private set; }
 
 		public void GetNextPoints(float fraction, List<Vector2> nextPointsList) {
@@ -97,7 +97,7 @@ namespace EquipmentGenerator {
 			nextPointsList.Add(new Vector2(fraction, 1));
 		}
 
-		public SquarePointSource(int resolution) {
+		public SquareRangeSource(int resolution) {
 			Resolution = resolution;
 		}
 	}
