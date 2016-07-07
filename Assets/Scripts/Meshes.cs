@@ -4,6 +4,32 @@ using UnityEngine;
 
 namespace EquipmentGenerator {
 
+	public static class MeshHelpers {
+
+		/// <summary>Add a triangle to the list of triangles.</summary>
+		/// <param name="triangles">List of triangles.</param>
+		/// <param name="idx1">Index of first triangle.</param>
+		/// <param name="idx2">Index of second triangle.</param>
+		/// <param name="idx3">Index of third triangle.</param>
+		/// <param name="insideOut">
+		/// <c>true</c>, if the triangle should be added flipped, <c>false</c> otherwise. Default is <c>false</c>.
+		/// </param>
+		/// <returns>A reference to the list. This is useful to chain multiple additions.</returns>
+		public static List<int> AddTriangle(this List<int> triangles, int idx1, int idx2, int idx3, bool insideOut = false) {
+			if (insideOut) {
+				triangles.Add(idx1);
+				triangles.Add(idx3);
+				triangles.Add(idx2);
+			} else {
+				triangles.Add(idx1);
+				triangles.Add(idx2);
+				triangles.Add(idx3);
+			}
+
+			return triangles;
+		}
+	}
+
 	/// <summary>
 	/// Class containing vertices and triangles for sub meshes. Use method <see cref="Combine"/> to combine multiple sub
 	/// meshes into a <see cref="Mesh"/>.
