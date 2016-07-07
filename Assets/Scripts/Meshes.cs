@@ -61,10 +61,11 @@ namespace EquipmentGenerator {
 
 		/// <summary>Modify the vertices of this sub mesh with the function <paramref name="modifyFunc"/>.</summary>
 		/// <param name="modifyFunc">Modification function.</param>
-		public void Modify(System.Func<Vector3, Vector3> modifyFunc) {
+		public SubMesh Modify(System.Func<Vector3, Vector3> modifyFunc) {
 			for (int i = 0; i < _vertices.Count; i++) {
 				_vertices[i] = modifyFunc(_vertices[i]);
 			}
+			return this;
 		}
 
 		/// <summary>Combine multiple sub meshes into a Unity <see cref="Mesh"/>.</summary>
