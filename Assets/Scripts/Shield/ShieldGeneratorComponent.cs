@@ -13,28 +13,27 @@ namespace EquipmentGenerator.Shield {
 
 		public float radius = 3f;
 
+		public float depth = 0.1f;
+
 		[Range(-0.5f, 0.5f)]
 		public float offset = 0.5f;
 
 		public Vector2 scale = Vector2.one;
-		// public bool invert = false;
 
 		public AnimationCurve curve;
 		public AnimationCurve curveBottom;
 
 		public void GenerateShield() {
-			// var newShield = new ShieldGenerator().Generate(System.Environment.TickCount);
-
-			var top = CylindricalMeshGenerator.Generate(new FunctionPointSource(x => curve.Evaluate(x), res), scale, radius, offset);
-			var middle = CylindricalMeshGenerator.Generate(new SquarePointSource(res), scale, radius, offset);
-			var bottom = CylindricalMeshGenerator.Generate(new FunctionPointSource(x => curveBottom.Evaluate(x), res, true), scale,
-				radius, offset);
-			var subMeshes = new List<SubMesh>();
-			subMeshes.Add(top);
-			subMeshes.Add(middle);
-			subMeshes.Add(bottom);
-			middle.Modify(v => v += Vector3.down * scale.y);
-			bottom.Modify(v => v += Vector3.down * scale.y * 2f);
+			var subMeshes = new List<SubMesh> {
+				CylindricalMeshGenerator.Generate(new FunctionPointSource(x => curve.Evaluate(x), res), scale, radius, offset),
+				CylindricalMeshGenerator.Generate(new FunctionPointSource(x => curve.Evaluate(x), res), scale, radius-depth, offset, true).Modify(v=>v + Vector3.forward * depth),
+				CylindricalMeshGenerator.Generate(new SquarePointSource(res), scale, radius, offset).Modify(v => v + Vector3.down * scale.y),
+				CylindricalMeshGenerator.Generate(new SquarePointSource(res), scale, radius-depth, offset,true).Modify(v => v + Vector3.down * scale.y+ Vector3.forward * depth),
+				CylindricalMeshGenerator.Generate(new FunctionPointSource(x => curveBottom.Evaluate(x), res, true), scale,
+					radius, offset).Modify(v => v + Vector3.down * scale.y * 2f),
+				CylindricalMeshGenerator.Generate(new FunctionPointSource(x => curveBottom.Evaluate(x), res, true), scale,
+					radius-depth, offset,true).Modify(v => v + Vector3.down * scale.y * 2f+ Vector3.forward * depth)
+			};
 			var mesh = SubMesh.Combine(subMeshes);
 
 			var meshFilter = GetComponent<MeshFilter>();
