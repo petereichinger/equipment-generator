@@ -1,13 +1,15 @@
 ﻿using System;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace EquipmentGenerator {
+
 	/// <summary>
 	/// Interface for a point source that can be used in <see cref="Generate"/>. Point sources always operate in the
 	/// range [0:1].
 	/// </summary>
 	public interface IPointSource {
+
 		/// <summary>
 		/// Resolution of this point source. This is the number of cells that will be created in the horizontal.
 		/// </summary>
@@ -71,8 +73,8 @@ namespace EquipmentGenerator {
 			Resolution = resolution;
 			_function = function;
 			_inverted = inverted;
-			_minY = _function(0f);
-			_maxY = _function(0f);
+			_minY = 0f;
+			_maxY = 1f;
 
 			for (int i = 0; i < resolution; i++) {
 				float val = _function((float)i / resolution);
