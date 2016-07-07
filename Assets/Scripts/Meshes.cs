@@ -6,6 +6,15 @@ namespace EquipmentGenerator {
 
 	public static class MeshHelpers {
 
+		/// <summary>Add 2D points to a list of vertices.</summary>
+		/// <param name="vertices">List of vertices.</param>
+		/// <param name="points">List of points.</param>
+		public static void AddPoints(this List<Vector3> vertices, List<Vector2> points) {
+			for (int i = 0; i < points.Count; i++) {
+				vertices.Add(points[i]);
+			}
+		}
+
 		/// <summary>Add a triangle to the list of triangles.</summary>
 		/// <param name="triangles">List of triangles.</param>
 		/// <param name="idx1">Index of first triangle.</param>
