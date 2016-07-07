@@ -41,7 +41,7 @@ namespace EquipmentGenerator {
 	/// <summary>
 	/// Point source that uses a <see cref="System.Func{T,TResult}"/> with ( <see cref="float"/> as generic parameters).
 	/// </summary>
-	public class FunctionRangeSource : IRangeSource {
+	public class FunctionSource : IRangeSource {
 		public int Resolution { get; private set; }
 
 		/// <summary>Function that is evaluated.</summary>
@@ -84,7 +84,7 @@ namespace EquipmentGenerator {
 		/// <param name="function">Function to use.</param>
 		/// <param name="resolution">Resolution.</param>
 		/// <param name="inverted">True if should be inverted or not.</param>
-		public FunctionRangeSource(Func<float, float> function, int resolution, bool inverted = false) {
+		public FunctionSource(Func<float, float> function, int resolution, bool inverted = false) {
 			Resolution = resolution;
 			_function = function;
 			_inverted = inverted;
@@ -103,7 +103,7 @@ namespace EquipmentGenerator {
 		}
 	}
 
-	public class SquareRangeSource : IRangeSource {
+	public class SquareSource : IRangeSource {
 		public int Resolution { get; private set; }
 
 		public void GetNextPoints(float fraction, List<Vector2> nextPointsList) {
@@ -111,7 +111,7 @@ namespace EquipmentGenerator {
 			nextPointsList.Add(new Vector2(fraction, 1));
 		}
 
-		public SquareRangeSource(int resolution) {
+		public SquareSource(int resolution) {
 			Resolution = resolution;
 		}
 	}

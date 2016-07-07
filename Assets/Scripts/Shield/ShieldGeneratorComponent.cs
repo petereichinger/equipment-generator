@@ -25,13 +25,13 @@ namespace EquipmentGenerator.Shield {
 
 		public void GenerateShield() {
 			var subMeshes = new List<SubMesh> {
-				CylindricalMeshGenerator.Generate(new FunctionRangeSource(x => curve.Evaluate(x), res), scale, radius, offset),
-				CylindricalMeshGenerator.Generate(new FunctionRangeSource(x => curve.Evaluate(x), res), scale, radius-depth, offset, true).Modify(v=>v + Vector3.forward * depth),
-				CylindricalMeshGenerator.Generate(new SquareRangeSource(res), scale, radius, offset).Modify(v => v + Vector3.down * scale.y),
-				CylindricalMeshGenerator.Generate(new SquareRangeSource(res), scale, radius-depth, offset,true).Modify(v => v + Vector3.down * scale.y+ Vector3.forward * depth),
-				CylindricalMeshGenerator.Generate(new FunctionRangeSource(x => curveBottom.Evaluate(x), res, true), scale,
+				CylindricalMeshGenerator.Generate(new FunctionSource(x => curve.Evaluate(x), res), scale, radius, offset),
+				CylindricalMeshGenerator.Generate(new FunctionSource(x => curve.Evaluate(x), res), scale, radius-depth, offset, true).Modify(v=>v + Vector3.forward * depth),
+				CylindricalMeshGenerator.Generate(new SquareSource(res), scale, radius, offset).Modify(v => v + Vector3.down * scale.y),
+				CylindricalMeshGenerator.Generate(new SquareSource(res), scale, radius-depth, offset,true).Modify(v => v + Vector3.down * scale.y+ Vector3.forward * depth),
+				CylindricalMeshGenerator.Generate(new FunctionSource(x => curveBottom.Evaluate(x), res, true), scale,
 					radius, offset).Modify(v => v + Vector3.down * scale.y * 2f),
-				CylindricalMeshGenerator.Generate(new FunctionRangeSource(x => curveBottom.Evaluate(x), res, true), scale,
+				CylindricalMeshGenerator.Generate(new FunctionSource(x => curveBottom.Evaluate(x), res, true), scale,
 					radius-depth, offset,true).Modify(v => v + Vector3.down * scale.y * 2f+ Vector3.forward * depth)
 			};
 			var mesh = SubMesh.Combine(subMeshes);
