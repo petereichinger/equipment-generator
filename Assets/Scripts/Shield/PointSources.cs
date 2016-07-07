@@ -5,8 +5,8 @@ using UnityEngine;
 namespace EquipmentGenerator {
 
 	/// <summary>
-	/// Interface for a point source that can be used in <see cref="Generate"/>. Point sources always operate in the
-	/// range [0:1].
+	/// Interface for a point source that can be used in <see cref="CylindricalMeshGenerator.Generate"/>. Point sources
+	/// always operate in the range [0:1].
 	/// </summary>
 	public interface IPointSource {
 
@@ -50,6 +50,7 @@ namespace EquipmentGenerator {
 		/// <param name="nextPointsList">List where the new points are stored.</param>
 		public void GetNextPoints(float fraction, List<Vector2> nextPointsList) {
 			float x = fraction;
+
 			float value = _function(x);
 
 			if (!_inverted) {
