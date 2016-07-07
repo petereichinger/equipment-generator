@@ -5,8 +5,8 @@ using UnityEngine;
 namespace EquipmentGenerator {
 
 	/// <summary>
-	/// Interface for a point source that can be used in <see cref="CylindricalMeshGenerator.Generate"/>. Point sources
-	/// always operate in the range [0:1].
+	/// Interface for a point source that can be used in <see cref="CylindricalMeshGenerator.Generate"/>. Range sources
+	/// return a range with the minimum and maximum always in the range [0:1].
 	/// </summary>
 	public interface IRangeSource {
 
@@ -22,6 +22,20 @@ namespace EquipmentGenerator {
 		/// method.
 		/// </param>
 		void GetNextPoints(float fraction, List<Vector2> nextPointsList);
+	}
+
+	/// <summary>Interface for a source that only returns a single value.</summary>
+	public interface IPointSource {
+
+		/// <summary>
+		/// Resolution of this point source. This is the number of cells that will be created in the horizontal.
+		/// </summary>
+		int Resolution { get; }
+
+		/// <summary>Get the points for a certain fraction.</summary>
+		/// <param name="fraction">Fraction.</param>
+		/// <returns>The value for the specified fraction.</returns>
+		Vector2 GetNextPoint(float fraction);
 	}
 
 	/// <summary>
