@@ -41,7 +41,7 @@ namespace EquipmentGenerator {
 	/// <summary>
 	/// Point source that uses a <see cref="System.Func{T,TResult}"/> with ( <see cref="float"/> as generic parameters).
 	/// </summary>
-	public class FunctionSource : IRangeSource {
+	public class FunctionSource : IRangeSource, IPointSource {
 		public int Resolution { get; private set; }
 
 		/// <summary>Function that is evaluated.</summary>
@@ -80,6 +80,10 @@ namespace EquipmentGenerator {
 			}
 		}
 
+		public Vector2 GetNextPoint(float fraction) {
+			return new Vector2(fraction, _function(fraction));
+		}
+
 		/// <summary>Create a new instance of this point source.</summary>
 		/// <param name="function">Function to use.</param>
 		/// <param name="resolution">Resolution.</param>
@@ -103,8 +107,12 @@ namespace EquipmentGenerator {
 		}
 	}
 
-	public class SquareSource : IRangeSource {
+	public class SquareSource : IRangeSource, IPointSource {
 		public int Resolution { get; private set; }
+
+		public Vector2 GetNextPoint(float fraction) {
+			return new Vector2(fraction, 1f);
+		}
 
 		public void GetNextPoints(float fraction, List<Vector2> nextPointsList) {
 			nextPointsList.Add(new Vector2(fraction, 0));
