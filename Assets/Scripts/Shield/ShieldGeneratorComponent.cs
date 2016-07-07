@@ -25,9 +25,9 @@ namespace EquipmentGenerator.Shield {
 		public void GenerateShield() {
 			// var newShield = new ShieldGenerator().Generate(System.Environment.TickCount);
 
-			var top = new FunctionMeshGenerator().Generate(new FunctionPointSource(x => curve.Evaluate(x), res), scale, radius, offset);
-			var middle = new FunctionMeshGenerator().Generate(new SquarePointSource(res), scale, radius, offset);
-			var bottom = new FunctionMeshGenerator().Generate(new FunctionPointSource(x => curveBottom.Evaluate(x), res, true), scale,
+			var top = CylindricalMeshGenerator.Generate(new FunctionPointSource(x => curve.Evaluate(x), res), scale, radius, offset);
+			var middle = CylindricalMeshGenerator.Generate(new SquarePointSource(res), scale, radius, offset);
+			var bottom = CylindricalMeshGenerator.Generate(new FunctionPointSource(x => curveBottom.Evaluate(x), res, true), scale,
 				radius, offset);
 			var subMeshes = new List<SubMesh>();
 			subMeshes.Add(top);

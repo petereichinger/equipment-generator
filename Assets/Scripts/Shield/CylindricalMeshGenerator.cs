@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace EquipmentGenerator {
 
-	public class FunctionMeshGenerator {
+	public class CylindricalMeshGenerator {
 
-		public SubMesh Generate(IPointSource pointSource, Vector2 scale, float radius = 0f, float offset = 0f) {
+		public static SubMesh Generate(IPointSource pointSource, Vector2 scale, float radius = 0f, float offset = 0f) {
 			float sqrRadius = Mathf.Pow(radius, 2);
 
 			List<Vector3> points = new List<Vector3>(pointSource.Resolution * 2 + 1);
