@@ -108,6 +108,9 @@ namespace EquipmentGenerator {
 					mesh.SetTriangles(subMeshTriangles[i], i);
 				}
 			}
+
+			mesh.RecalculateNormals();
+			mesh.RecalculateBounds();
 			return mesh;
 		}
 	}
