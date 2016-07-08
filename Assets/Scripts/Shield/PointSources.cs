@@ -21,7 +21,7 @@ namespace EquipmentGenerator {
 		/// List where the next points should be stored. This list should be cleared by the caller before calling this
 		/// method.
 		/// </param>
-		void GetNextPoints(float fraction, List<Vector2> nextPointsList);
+		void GetPoints(float fraction, List<Vector2> nextPointsList);
 	}
 
 	/// <summary>Interface for a source that only returns a single value.</summary>
@@ -34,10 +34,12 @@ namespace EquipmentGenerator {
 
 		bool ZeroOrigin { get; }
 
+		bool ZeroTarget { get; }
+
 		/// <summary>Get the points for a certain fraction.</summary>
 		/// <param name="fraction">Fraction.</param>
 		/// <returns>The value for the specified fraction.</returns>
-		Vector2 GetNextPoint(float fraction);
+		Vector2 GetPoint(float fraction);
 	}
 
 	/// <summary>
@@ -47,6 +49,8 @@ namespace EquipmentGenerator {
 		public int Resolution { get; private set; }
 
 		public bool ZeroOrigin { get { return !_inverted; } }
+
+		public bool ZeroTarget { get { return !_inverted; } }
 
 		/// <summary>Function that is evaluated.</summary>
 		private readonly Func<float, float> _function;
@@ -66,7 +70,7 @@ namespace EquipmentGenerator {
 		/// <summary>Get the next points with the function.</summary>
 		/// <param name="fraction">Fraction.</param>
 		/// <param name="nextPointsList">List where the new points are stored.</param>
-		public void GetNextPoints(float fraction, List<Vector2> nextPointsList) {
+		public void GetPoints(float fraction, List<Vector2> nextPointsList) {
 			float x = fraction;
 
 			float value = _function(x);
@@ -84,7 +88,7 @@ namespace EquipmentGenerator {
 			}
 		}
 
-		public Vector2 GetNextPoint(float fraction) {
+		public Vector2 GetPoint(float fraction) {
 			return new Vector2(fraction, _function(fraction));
 		}
 
@@ -116,11 +120,13 @@ namespace EquipmentGenerator {
 
 		public bool ZeroOrigin { get { return true; } }
 
-		public Vector2 GetNextPoint(float fraction) {
+		public bool ZeroTarget { get { return true; } }
+
+		public Vector2 GetPoint(float fraction) {
 			return new Vector2(fraction, 1f);
 		}
 
-		public void GetNextPoints(float fraction, List<Vector2> nextPointsList) {
+		public void GetPoints(float fraction, List<Vector2> nextPointsList) {
 			nextPointsList.Add(new Vector2(fraction, 0));
 			nextPointsList.Add(new Vector2(fraction, 1));
 		}
