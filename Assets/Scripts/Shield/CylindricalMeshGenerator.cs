@@ -35,7 +35,7 @@ namespace EquipmentGenerator {
 						points.Add((Vector3)newPoint + Vector3.forward * depth);
 					}
 				} else {
-					if (((parts & Parts.Left) != 0)) {
+					if ((parts & Parts.Left) != 0) {
 						if (source.ZeroOrigin) {
 							points.Add(new Vector3(0, 0));
 							points.Add(new Vector3(0, 0, depth));
