@@ -1,41 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace EquipmentGenerator {
 
 	public class CylindricalMeshGenerator {
 
-		public static SubMesh GenerateOutside(IPointSource source, Vector2 scale, float radius = 1f, float offset = 0f, bool flip = false, float depth = 0.1f) {
+		[System.Flags]
+		public enum Parts {
+			Left = 0x4,
+			Middle = 0x2,
+			Right = 0x1,
+			LeftRight = Left | Right,
+			All = Left | Middle | Right,
+		}
+
+		public static SubMesh GenerateOutside(IPointSource source, Vector2 scale, float radius = 1f, float offset = 0f, bool flip = false, float depth = 0.1f, Parts parts = Parts.All) {
 			List<Vector3> points = new List<Vector3>();
 			List<int> triangles = new List<int>();
 
 			Vector2? oldPoint = null;
 
 			for (int i = 0; i <= source.Resolution; i++) {
-				Vector2 newPoint = source.GetNextPoint((float)i / source.Resolution);
+				Vector2 newPoint = source.GetPoint((float)i / source.Resolution);
 
 				int offsetOld = points.Count;
 				int offsetNew = offsetOld + 2;
 
 				if (oldPoint.HasValue) {
-					points.Add(oldPoint.Value);
-					points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
+					if ((parts & Parts.Middle) != 0) {
+						points.Add(oldPoint.Value);
+						points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
 
-					points.Add(newPoint);
-					points.Add((Vector3)newPoint + Vector3.forward * depth);
+						points.Add(newPoint);
+						points.Add((Vector3)newPoint + Vector3.forward * depth);
+					}
 				} else {
-					if (source.ZeroOrigin) {
-						points.Add(new Vector3(0, 0));
-						points.Add(new Vector3(0, 0, depth));
-						points.Add(newPoint);
-						points.Add((Vector3)newPoint + Vector3.forward * depth);
-					} else {
-						points.Add(newPoint);
-						points.Add((Vector3)newPoint + Vector3.forward * depth);
+					if (((parts & Parts.Left) != 0)) {
+						if (source.ZeroOrigin) {
+							points.Add(new Vector3(0, 0));
+							points.Add(new Vector3(0, 0, depth));
+							points.Add(newPoint);
+							points.Add((Vector3)newPoint + Vector3.forward * depth);
+						} else {
+							points.Add(newPoint);
+							points.Add((Vector3)newPoint + Vector3.forward * depth);
 
-						points.Add(new Vector3(0, 1));
-						points.Add(new Vector3(0, 1, depth));
+							points.Add(new Vector3(0, 1));
+							points.Add(new Vector3(0, 1, depth));
+						}
 					}
 				}
 				triangles.AddTriangle(offsetOld, offsetOld + 1, offsetNew, flip);
@@ -44,22 +56,24 @@ namespace EquipmentGenerator {
 				oldPoint = newPoint;
 			}
 			if (oldPoint.HasValue) {
-				int offsetOld = points.Count;
-				int offsetNew = offsetOld + 2;
-				if (source.ZeroOrigin) {
-					points.Add(oldPoint.Value);
-					points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
-					points.Add(new Vector3(1, 0));
-					points.Add(new Vector3(1, 0, depth));
-				} else {
-					points.Add(oldPoint.Value);
-					points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
-					points.Add(new Vector3(1, 1));
-					points.Add(new Vector3(1, 1, depth));
-				}
+				if ((parts & Parts.Right) != 0) {
+					int offsetOld = points.Count;
+					int offsetNew = offsetOld + 2;
+					if (source.ZeroTarget) {
+						points.Add(oldPoint.Value);
+						points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
+						points.Add(new Vector3(1, 0));
+						points.Add(new Vector3(1, 0, depth));
+					} else {
+						points.Add(oldPoint.Value);
+						points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
+						points.Add(new Vector3(1, 1));
+						points.Add(new Vector3(1, 1, depth));
+					}
 
-				triangles.AddTriangle(offsetOld, offsetOld + 1, offsetNew, flip);
-				triangles.AddTriangle(offsetOld + 1, offsetNew + 1, offsetNew, flip);
+					triangles.AddTriangle(offsetOld, offsetOld + 1, offsetNew, flip);
+					triangles.AddTriangle(offsetOld + 1, offsetNew + 1, offsetNew, flip);
+				}
 			}
 
 			OverlayOnCylinder(points, scale, radius, offset);
@@ -77,7 +91,7 @@ namespace EquipmentGenerator {
 			for (int i = 0; i <= rangeSource.Resolution; i++) {
 				newPoints.Clear();
 
-				rangeSource.GetNextPoints((float)i / rangeSource.Resolution, newPoints);
+				rangeSource.GetPoints((float)i / rangeSource.Resolution, newPoints);
 
 				int offsetOld = points.Count;
 				int offsetNew = offsetOld + oldPoints.Count;
