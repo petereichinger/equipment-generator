@@ -30,15 +30,15 @@ namespace EquipmentGenerator.Shield {
 			var outerOverlay = new CylinderOverlayShape(scale, radius, offset);
 			var innerOverlay = new CylinderOverlayShape(scale, radius - depth, offset);
 			var subMeshes = new List<SubMesh> {
-				CylindricalMeshGenerator.GenerateOrthogonal(upperSource,outerOverlay),
-				CylindricalMeshGenerator.GenerateParallel(upperSource,outerOverlay,false,depth),
-				CylindricalMeshGenerator.GenerateOrthogonal(upperSource, innerOverlay, true).Modify(v=>v + Vector3.forward * depth),
-				CylindricalMeshGenerator.GenerateOrthogonal(middleSource,outerOverlay).Modify(v => v + Vector3.down *scale.y),
-				CylindricalMeshGenerator.GenerateParallel(middleSource,outerOverlay,false,depth,CylindricalMeshGenerator.Parts.LeftRight).Modify(v => v + Vector3.down *scale.y),
-				CylindricalMeshGenerator.GenerateOrthogonal(middleSource,innerOverlay,true).Modify(v => v +Vector3.down * scale.y+ Vector3.forward * depth),
-				CylindricalMeshGenerator.GenerateOrthogonal(lowerSource, outerOverlay).Modify(v => v + Vector3.down * scale.y * 2f),
-				CylindricalMeshGenerator.GenerateParallel(lowerSource, outerOverlay,true,depth).Modify(v => v + Vector3.down * scale.y * 2f),
-				CylindricalMeshGenerator.GenerateOrthogonal(lowerSource, innerOverlay,true).Modify(v => v + Vector3.down * scale.y * 2f+ Vector3.forward * depth)
+				MeshGenerator.GenerateOrthogonal(upperSource,outerOverlay),
+				MeshGenerator.GenerateParallel(upperSource,outerOverlay,false,depth),
+				MeshGenerator.GenerateOrthogonal(upperSource, innerOverlay, true).Modify(v=>v + Vector3.forward * depth),
+				MeshGenerator.GenerateOrthogonal(middleSource,outerOverlay).Modify(v => v + Vector3.down *scale.y),
+				MeshGenerator.GenerateParallel(middleSource,outerOverlay,false,depth,MeshGenerator.Parts.LeftRight).Modify(v => v + Vector3.down *scale.y),
+				MeshGenerator.GenerateOrthogonal(middleSource,innerOverlay,true).Modify(v => v +Vector3.down * scale.y+ Vector3.forward * depth),
+				MeshGenerator.GenerateOrthogonal(lowerSource, outerOverlay).Modify(v => v + Vector3.down * scale.y * 2f),
+				MeshGenerator.GenerateParallel(lowerSource, outerOverlay,true,depth).Modify(v => v + Vector3.down * scale.y * 2f),
+				MeshGenerator.GenerateOrthogonal(lowerSource, innerOverlay,true).Modify(v => v + Vector3.down * scale.y * 2f+ Vector3.forward * depth)
 			};
 			var mesh = SubMesh.Combine(subMeshes);
 

@@ -58,7 +58,7 @@ namespace EquipmentGenerator {
 		}
 	}
 
-	public class CylindricalMeshGenerator {
+	public class MeshGenerator {
 
 		[System.Flags]
 		public enum Parts {
