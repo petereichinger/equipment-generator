@@ -6,6 +6,18 @@ namespace EquipmentGenerator {
 
 	public static class MeshHelpers {
 
+		/// <summary>
+		/// Add a <see cref="System.Nullable{T}"/> ( <see cref="Vector2"/>) to the list of vertices. If the point is <c>
+		/// null </c> it will not be added.
+		/// </summary>
+		/// <param name="vertices">List of vertices.</param>
+		/// <param name="point">Point to add. If <c>null</c> it wont be added.</param>
+		public static void AddPoint(this List<Vector3> vertices, Vector2? point) {
+			if (point.HasValue) {
+				vertices.Add(point.Value);
+			}
+		}
+
 		/// <summary>Add 2D points to a list of vertices.</summary>
 		/// <param name="vertices">List of vertices.</param>
 		/// <param name="points">List of points.</param>
