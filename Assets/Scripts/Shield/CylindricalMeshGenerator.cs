@@ -25,7 +25,7 @@ namespace EquipmentGenerator {
 
 				int offsetOld = points.Count;
 				int offsetNew = offsetOld + 2;
-
+				bool addTriangles = false;
 				if (oldPoint.HasValue) {
 					if ((parts & Parts.Middle) != 0) {
 						points.Add(oldPoint.Value);
@@ -33,40 +33,39 @@ namespace EquipmentGenerator {
 
 						points.Add(newPoint);
 						points.Add((Vector3)newPoint + Vector3.forward * depth);
+						addTriangles = true;
 					}
 				} else {
 					if ((parts & Parts.Left) != 0) {
 						if (source.ZeroOrigin) {
 							points.Add(new Vector3(0, 0));
 							points.Add(new Vector3(0, 0, depth));
-							points.Add(newPoint);
-							points.Add((Vector3)newPoint + Vector3.forward * depth);
-						} else {
-							points.Add(newPoint);
-							points.Add((Vector3)newPoint + Vector3.forward * depth);
-
+						}
+						points.Add(newPoint);
+						points.Add((Vector3)newPoint + Vector3.forward * depth);
+						if (!source.ZeroOrigin) {
 							points.Add(new Vector3(0, 1));
 							points.Add(new Vector3(0, 1, depth));
 						}
+						addTriangles = true;
 					}
 				}
-				triangles.AddTriangle(offsetOld, offsetOld + 1, offsetNew, flip);
-				triangles.AddTriangle(offsetOld + 1, offsetNew + 1, offsetNew, flip);
-
+				if (addTriangles) {
+					triangles.AddTriangle(offsetOld, offsetOld + 1, offsetNew, flip);
+					triangles.AddTriangle(offsetOld + 1, offsetNew + 1, offsetNew, flip);
+				}
 				oldPoint = newPoint;
 			}
 			if (oldPoint.HasValue) {
 				if ((parts & Parts.Right) != 0) {
 					int offsetOld = points.Count;
 					int offsetNew = offsetOld + 2;
+					points.Add(oldPoint.Value);
+					points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
 					if (source.ZeroTarget) {
-						points.Add(oldPoint.Value);
-						points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
 						points.Add(new Vector3(1, 0));
 						points.Add(new Vector3(1, 0, depth));
 					} else {
-						points.Add(oldPoint.Value);
-						points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
 						points.Add(new Vector3(1, 1));
 						points.Add(new Vector3(1, 1, depth));
 					}
