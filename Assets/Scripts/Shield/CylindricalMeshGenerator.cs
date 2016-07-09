@@ -3,17 +3,23 @@ using UnityEngine;
 
 namespace EquipmentGenerator {
 
+	/// <summary>Interface for a shape to overlay vertices on</summary>
 	public interface IOverlayShape {
 
 		void Overlay(List<Vector3> points);
 	}
 
-	public class OverlayShape : IOverlayShape {
+	/// <summary>Overlay shape for a cylinder.</summary>
+	public class CylinderOverlayShape : IOverlayShape {
 		private readonly Vector2 _scale;
 		private readonly float _radius;
 		private readonly float _offset;
 
-		public OverlayShape(Vector2 scale, float radius, float offset) {
+		/// <summary>Create a new instance of a Cylinder OverlayShape</summary>
+		/// <param name="scale">Scale of the overlay shape. <see cref="Vector2.x"/> is the angle of the</param>
+		/// <param name="radius"></param>
+		/// <param name="offset"></param>
+		public CylinderOverlayShape(Vector2 scale, float radius, float offset) {
 			_scale = scale;
 			_radius = radius;
 			_offset = offset;
@@ -63,8 +69,9 @@ namespace EquipmentGenerator {
 			All = Left | Middle | Right,
 		}
 
-		/// <summary>Generate a mesh, whose triangles are looking along the cylinder.</summary>
+		/// <summary>Generate a mesh, whose triangles are looking along the overlay shape.</summary>
 		/// <param name="source">Source for the points of the perimeter.</param>
+		/// <param name="overlayShape">Shape to overlay.</param>
 		/// <param name="inside"><c>true</c> if the triangles should face inwards.</param>
 		/// <param name="depth">Depth of the perimeter.</param>
 		/// <param name="parts">Specify which parts of the perimeter should be created.</param>
@@ -137,8 +144,11 @@ namespace EquipmentGenerator {
 			return new SubMesh(points, triangles);
 		}
 
-		/// <summary>Generate an outward or inward (orthogonal to the cylinder) facing <see cref="SubMesh"/>.</summary>
+		/// <summary>
+		/// Generate an outward or inward (orthogonal to the overlayshape) facing <see cref="SubMesh"/>.
+		/// </summary>
 		/// <param name="source">Source for the points.</param>
+		/// <param name="overlayShape">Shape to overlay</param>
 		/// <param name="inside">
 		/// <c>true</c> if the triangles should face outward of the cylinder, <c>false</c> otherwise.
 		/// </param>
