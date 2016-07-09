@@ -7,7 +7,6 @@ public class MeshDebug : MonoBehaviour {
 
 	private void Update() {
 		var mesh = GetComponent<MeshFilter>().sharedMesh;
-		Debug.Log(mesh.normals.Length);
 		for (int i = 0; i < mesh.vertexCount; i++) {
 			var pos = transform.TransformPoint(mesh.vertices[i]);
 
