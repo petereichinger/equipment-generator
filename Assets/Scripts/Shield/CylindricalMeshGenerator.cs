@@ -43,13 +43,13 @@ namespace EquipmentGenerator {
 				if (!oldPoint.HasValue) {
 					// No values calculated yet so we are at the left part.
 					if ((parts & Parts.Left) != 0) {
-						if (source.ZeroOrigin) {
+						if (source.ZeroBase) {
 							points.Add(new Vector3(0, 0));
 							points.Add(new Vector3(0, 0, depth));
 						}
 						points.Add(newPoint);
 						points.Add((Vector3)newPoint + Vector3.forward * depth);
-						if (!source.ZeroOrigin) {
+						if (!source.ZeroBase) {
 							points.Add(new Vector3(0, 1));
 							points.Add(new Vector3(0, 1, depth));
 						}
@@ -78,7 +78,7 @@ namespace EquipmentGenerator {
 					int offsetNew = offsetOld + 2;
 					points.Add(oldPoint.Value);
 					points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
-					if (source.ZeroTarget) {
+					if (source.ZeroBase) {
 						points.Add(new Vector3(1, 0));
 						points.Add(new Vector3(1, 0, depth));
 					} else {
@@ -97,7 +97,7 @@ namespace EquipmentGenerator {
 		}
 
 		/// <summary>Generate an outward or inward (orthogonal to the cylinder) facing <see cref="SubMesh"/>.</summary>
-		/// <param name="rangeSource">Source for the points.</param>
+		/// <param name="source">Source for the points.</param>
 		/// <param name="scale">
 		/// Scaling of the perimeter. <see cref="Vector2.x"/> is the angle of the shield. <see cref="Vector2.y"/> is the
 		/// height of the shield.
@@ -110,24 +110,26 @@ namespace EquipmentGenerator {
 		/// <c>true</c> if the triangles should face outward of the cylinder, <c>false</c> otherwise.
 		/// </param>
 		/// <returns>A <see cref="SubMesh"/> with the mesh.</returns>
-		public static SubMesh GenerateOrthogonal(IRangeSource rangeSource, Vector2 scale, float radius = 1f, float offset = 0f, bool inside = false) {
-			List<Vector3> points = new List<Vector3>(rangeSource.Resolution * 2 + 1);
+		public static SubMesh GenerateOrthogonal(IPointSource source, Vector2 scale, float radius = 1f, float offset = 0f, bool inside = false) {
+			List<Vector3> points = new List<Vector3>(source.Resolution * 2 + 1);
 			List<int> triangleIndices = new List<int>();
 
-			List<Vector2> newPoints = new List<Vector2>(3);
-			List<Vector2> oldPoints = new List<Vector2>(3);
+			Tuple<Vector2?, Vector2?> oldValues = new Tuple<Vector2?, Vector2?>(null, null);
+			Tuple<Vector2?, Vector2?> newValues = new Tuple<Vector2?, Vector2?>(null, null);
 
-			for (int i = 0; i <= rangeSource.Resolution; i++) {
-				newPoints.Clear();
+			for (int i = 0; i <= source.Resolution; i++) {
+				newValues.Clear();
 
-				rangeSource.GetPoints((float)i / rangeSource.Resolution, newPoints);
+				var fraction = (float)i / source.Resolution;
+				newValues.Value1 = source.GetLowerPoint(fraction);
+				newValues.Value2 = source.GetUpperPoint(fraction);
 
 				int offsetOld = points.Count;
-				int offsetNew = offsetOld + oldPoints.Count;
+				int offsetNew = offsetOld + (oldValues.Value1 != null ? 1 : 0) + (oldValues.Value2 != null ? 1 : 0);
 
-				if (oldPoints.Count > 0) {
-					if (newPoints.Count == 2) {
-						if (oldPoints.Count == 2) {
+				if (oldValues.Value1 != null) {
+					if (newValues.Value1 != null && newValues.Value2 != null) {
+						if (oldValues.Value2 != null) {
 							triangleIndices.AddTriangle(offsetOld, offsetOld + 1, offsetNew + 1, inside);
 						}
 						triangleIndices.AddTriangle(offsetOld, offsetNew + 1, offsetNew, inside);
@@ -136,12 +138,15 @@ namespace EquipmentGenerator {
 					}
 				}
 
-				points.AddPoints(oldPoints);
-				oldPoints.Clear();
-				oldPoints.AddRange(newPoints);
+				points.AddPoint(oldValues.Value1);
+				points.AddPoint(oldValues.Value2);
+
+				oldValues.Value1 = newValues.Value1;
+				oldValues.Value2 = newValues.Value2;
 			}
 
-			points.AddPoints(newPoints);
+			points.AddPoint(newValues.Value1);
+			points.AddPoint(newValues.Value2);
 
 			OverlayOnCylinder(points, scale, radius, offset);
 
