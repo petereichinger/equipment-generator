@@ -9,6 +9,35 @@ namespace EquipmentGenerator {
 		void Overlay(List<Vector3> points);
 	}
 
+	/// <summary>Overlay shape that angles the mesh with a corner in the center.</summary>
+	public class AngledOverlayShape : IOverlayShape {
+		private readonly float _gradient;
+		private readonly Vector2 _scale;
+		private readonly float _offset;
+
+		/// <summary>Create a new overlay shape.</summary>
+		/// <param name="gradient">Gradient of the angle.</param>
+		/// <param name="scale">Scaling.</param>
+		/// <param name="offset">Normalized offset for the overlay shape.</param>
+		public AngledOverlayShape(float gradient, Vector2 scale, float offset = 0f) {
+			_gradient = gradient;
+			_scale = scale;
+			_offset = offset;
+		}
+
+		public void Overlay(List<Vector3> points) {
+			for (int i = 0; i < points.Count; i++) {
+				var point = points[i];
+				point.x -= _offset + 0.5f;
+
+				point.Scale(new Vector3(_scale.x, _scale.y, 1f));
+
+				point.z += Mathf.Abs(_gradient * point.x);
+				points[i] = point;
+			}
+		}
+	}
+
 	/// <summary>Overlay shape for a cylinder.</summary>
 	public class CylinderOverlayShape : IOverlayShape {
 		private readonly Vector2 _scale;
