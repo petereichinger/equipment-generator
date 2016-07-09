@@ -3,6 +3,55 @@ using UnityEngine;
 
 namespace EquipmentGenerator {
 
+	public interface IOverlayShape {
+
+		void Overlay(List<Vector3> points);
+	}
+
+	public class OverlayShape : IOverlayShape {
+		private readonly Vector2 _scale;
+		private readonly float _radius;
+		private readonly float _offset;
+
+		public OverlayShape(Vector2 scale, float radius, float offset) {
+			_scale = scale;
+			_radius = radius;
+			_offset = offset;
+		}
+
+		/// <summary>
+		/// Modifies <paramref name="points"/> so that they are on a y-axis cylinder with the radius <see
+		/// cref="_radius"/>
+		/// </summary>
+		/// <param name="points">Points to overlay on the cylinder.</param>
+		public void Overlay(List<Vector3> points) {
+			// Scale and move points
+			if (_radius <= 0f) {
+				Debug.LogError("radius must be > 0");
+				return;
+			}
+
+			for (int i = 0; i < points.Count; i++) {
+				var point = points[i];
+
+				point.x -= _offset + 0.5f;
+
+				float realWidth = (_radius - point.z) * Mathf.Deg2Rad * _scale.x;
+
+				point.Scale(new Vector3(realWidth, _scale.y, 1f));
+
+				float finalX = point.x;
+				float pow = Mathf.Pow(finalX, 2f);
+				float sqrRadius = Mathf.Pow(_radius - point.z, 2f);
+				if (sqrRadius > pow) {
+					float z = -Mathf.Sqrt(sqrRadius - pow);
+					point.z = z + _radius;
+				}
+				points[i] = point;
+			}
+		}
+	}
+
 	public class CylindricalMeshGenerator {
 
 		[System.Flags]
@@ -16,19 +65,11 @@ namespace EquipmentGenerator {
 
 		/// <summary>Generate a mesh, whose triangles are looking along the cylinder.</summary>
 		/// <param name="source">Source for the points of the perimeter.</param>
-		/// <param name="scale">
-		/// Scaling of the perimeter. <see cref="Vector2.x"/> is the angle of the shield. <see cref="Vector2.y"/> is the
-		/// height of the shield.
-		/// </param>
-		/// <param name="radius">Radius of the cylinder for the mesh.</param>
-		/// <param name="offset">
-		/// Offset of the shield. Allows creation of only left or right part of a cylindrical mesh.Default is 0f.
-		/// </param>
 		/// <param name="inside"><c>true</c> if the triangles should face inwards.</param>
 		/// <param name="depth">Depth of the perimeter.</param>
 		/// <param name="parts">Specify which parts of the perimeter should be created.</param>
 		/// <returns>A sub mesh with the generated mesh for the perimeter.</returns>
-		public static SubMesh GenerateParallel(IPointSource source, Vector2 scale, float radius = 1f, float offset = 0f, bool inside = false, float depth = 0.1f, Parts parts = Parts.All) {
+		public static SubMesh GenerateParallel(IPointSource source, IOverlayShape overlayShape, bool inside = false, float depth = 0.1f, Parts parts = Parts.All) {
 			List<Vector3> points = new List<Vector3>();
 			List<int> triangles = new List<int>();
 
@@ -91,26 +132,18 @@ namespace EquipmentGenerator {
 				}
 			}
 
-			OverlayOnCylinder(points, scale, radius, offset);
+			overlayShape.Overlay(points);
 
 			return new SubMesh(points, triangles);
 		}
 
 		/// <summary>Generate an outward or inward (orthogonal to the cylinder) facing <see cref="SubMesh"/>.</summary>
 		/// <param name="source">Source for the points.</param>
-		/// <param name="scale">
-		/// Scaling of the perimeter. <see cref="Vector2.x"/> is the angle of the shield. <see cref="Vector2.y"/> is the
-		/// height of the shield.
-		/// </param>
-		/// <param name="radius">Radius of the cylinder for the mesh.</param>
-		/// <param name="offset">
-		/// Offset of the shield. Allows creation of only left or right part of a cylindrical mesh.Default is 0f.
-		/// </param>
 		/// <param name="inside">
 		/// <c>true</c> if the triangles should face outward of the cylinder, <c>false</c> otherwise.
 		/// </param>
 		/// <returns>A <see cref="SubMesh"/> with the mesh.</returns>
-		public static SubMesh GenerateOrthogonal(IPointSource source, Vector2 scale, float radius = 1f, float offset = 0f, bool inside = false) {
+		public static SubMesh GenerateOrthogonal(IPointSource source, IOverlayShape overlayShape, bool inside = false) {
 			List<Vector3> points = new List<Vector3>(source.Resolution * 2 + 1);
 			List<int> triangleIndices = new List<int>();
 
@@ -148,48 +181,9 @@ namespace EquipmentGenerator {
 			points.AddPoint(newValues.Value1);
 			points.AddPoint(newValues.Value2);
 
-			OverlayOnCylinder(points, scale, radius, offset);
+			overlayShape.Overlay(points);
 
 			return new SubMesh(points, triangleIndices);
-		}
-
-		/// <summary>
-		/// Modifies <paramref name="points"/> so that they are on a y-axis cylinder with the radius <paramref
-		/// name="radius"/>.
-		/// </summary>
-		/// <param name="points">Points to overlay on the cylinder.</param>
-		/// <param name="scale">
-		/// Scaling. <see cref="Vector2.x"/> is the angle of the mesh. <see cref="Vector2.y"/> is the height of the mesh.
-		/// </param>
-		/// <param name="radius">Radius of the cylinder in Unity length-units. Must be greater than 0.</param>
-		/// <param name="offset">
-		/// Normalized offset of the points. Use this to create only left or right part of the cylinder.
-		/// </param>
-		private static void OverlayOnCylinder(List<Vector3> points, Vector2 scale, float radius, float offset) {
-			// Scale and move points
-			if (radius <= 0f) {
-				Debug.LogError("radius must be > 0");
-				return;
-			}
-
-			for (int i = 0; i < points.Count; i++) {
-				var point = points[i];
-
-				point.x -= offset + 0.5f;
-
-				float realWidth = (radius - point.z) * Mathf.Deg2Rad * scale.x;
-
-				point.Scale(new Vector3(realWidth, scale.y, 1f));
-
-				float finalX = point.x;
-				float pow = Mathf.Pow(finalX, 2f);
-				float sqrRadius = Mathf.Pow(radius - point.z, 2f);
-				if (sqrRadius > pow) {
-					float z = -Mathf.Sqrt(sqrRadius - pow);
-					point.z = z + radius;
-				}
-				points[i] = point;
-			}
 		}
 	}
 }
