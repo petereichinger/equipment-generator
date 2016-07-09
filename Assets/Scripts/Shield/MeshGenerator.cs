@@ -16,10 +16,10 @@ namespace EquipmentGenerator {
 		private readonly float _offset;
 
 		/// <summary>Create a new instance of a Cylinder OverlayShape</summary>
+		/// <param name="radius">Radius of the cylinder.</param>
 		/// <param name="scale">Scale of the overlay shape. <see cref="Vector2.x"/> is the angle of the</param>
-		/// <param name="radius"></param>
-		/// <param name="offset"></param>
-		public CylinderOverlayShape(Vector2 scale, float radius, float offset) {
+		/// <param name="offset">Normalized offset for the overlay shape.</param>
+		public CylinderOverlayShape(float radius, Vector2 scale, float offset = 0f) {
 			_scale = scale;
 			_radius = radius;
 			_offset = offset;

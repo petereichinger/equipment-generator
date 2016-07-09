@@ -27,8 +27,8 @@ namespace EquipmentGenerator.Shield {
 			var upperSource = new FunctionSource(x => curve.Evaluate(x), res);
 			var middleSource = new SquareSource(res);
 			var lowerSource = new FunctionSource(x => curveBottom.Evaluate(x), res, true);
-			var outerOverlay = new CylinderOverlayShape(scale, radius, offset);
-			var innerOverlay = new CylinderOverlayShape(scale, radius - depth, offset);
+			var outerOverlay = new CylinderOverlayShape(radius, scale, offset);
+			var innerOverlay = new CylinderOverlayShape(radius - depth, scale, offset);
 			var subMeshes = new List<SubMesh> {
 				MeshGenerator.GenerateOrthogonal(upperSource,outerOverlay),
 				MeshGenerator.GenerateParallel(upperSource,outerOverlay,false,depth),
