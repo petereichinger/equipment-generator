@@ -14,7 +14,21 @@ namespace EquipmentGenerator {
 			All = Left | Middle | Right,
 		}
 
-		public static SubMesh GenerateOutside(IPointSource source, Vector2 scale, float radius = 1f, float offset = 0f, bool flip = false, float depth = 0.1f, Parts parts = Parts.All) {
+		/// <summary>Generate a mesh, whose triangles are looking along the cylinder.</summary>
+		/// <param name="source">Source for the points of the perimeter.</param>
+		/// <param name="scale">
+		/// Scaling of the perimeter. <see cref="Vector2.x"/> is the angle of the shield. <see cref="Vector2.y"/> is the
+		/// height of the shield.
+		/// </param>
+		/// <param name="radius">Radius of the cylinder for the mesh.</param>
+		/// <param name="offset">
+		/// Offset of the shield. Allows creation of only left or right part of a cylindrical mesh.Default is 0f.
+		/// </param>
+		/// <param name="inside"><c>true</c> if the triangles should face inwards.</param>
+		/// <param name="depth">Depth of the perimeter.</param>
+		/// <param name="parts">Specify which parts of the perimeter should be created.</param>
+		/// <returns>A sub mesh with the generated mesh for the perimeter.</returns>
+		public static SubMesh GenerateParallel(IPointSource source, Vector2 scale, float radius = 1f, float offset = 0f, bool inside = false, float depth = 0.1f, Parts parts = Parts.All) {
 			List<Vector3> points = new List<Vector3>();
 			List<int> triangles = new List<int>();
 
@@ -26,16 +40,8 @@ namespace EquipmentGenerator {
 				int offsetOld = points.Count;
 				int offsetNew = offsetOld + 2;
 				bool addTriangles = false;
-				if (oldPoint.HasValue) {
-					if ((parts & Parts.Middle) != 0) {
-						points.Add(oldPoint.Value);
-						points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
-
-						points.Add(newPoint);
-						points.Add((Vector3)newPoint + Vector3.forward * depth);
-						addTriangles = true;
-					}
-				} else {
+				if (!oldPoint.HasValue) {
+					// No values calculated yet so we are at the left part.
 					if ((parts & Parts.Left) != 0) {
 						if (source.ZeroOrigin) {
 							points.Add(new Vector3(0, 0));
@@ -49,10 +55,20 @@ namespace EquipmentGenerator {
 						}
 						addTriangles = true;
 					}
+				} else {
+					// We already have the left part so we create the middle.
+					if ((parts & Parts.Middle) != 0) {
+						points.Add(oldPoint.Value);
+						points.Add((Vector3)oldPoint.Value + Vector3.forward * depth);
+
+						points.Add(newPoint);
+						points.Add((Vector3)newPoint + Vector3.forward * depth);
+						addTriangles = true;
+					}
 				}
 				if (addTriangles) {
-					triangles.AddTriangle(offsetOld, offsetOld + 1, offsetNew, flip);
-					triangles.AddTriangle(offsetOld + 1, offsetNew + 1, offsetNew, flip);
+					triangles.AddTriangle(offsetOld, offsetOld + 1, offsetNew, inside);
+					triangles.AddTriangle(offsetOld + 1, offsetNew + 1, offsetNew, inside);
 				}
 				oldPoint = newPoint;
 			}
@@ -70,8 +86,8 @@ namespace EquipmentGenerator {
 						points.Add(new Vector3(1, 1, depth));
 					}
 
-					triangles.AddTriangle(offsetOld, offsetOld + 1, offsetNew, flip);
-					triangles.AddTriangle(offsetOld + 1, offsetNew + 1, offsetNew, flip);
+					triangles.AddTriangle(offsetOld, offsetOld + 1, offsetNew, inside);
+					triangles.AddTriangle(offsetOld + 1, offsetNew + 1, offsetNew, inside);
 				}
 			}
 
@@ -80,7 +96,21 @@ namespace EquipmentGenerator {
 			return new SubMesh(points, triangles);
 		}
 
-		public static SubMesh Generate(IRangeSource rangeSource, Vector2 scale, float radius = 1f, float offset = 0f, bool flip = false) {
+		/// <summary>Generate an outward or inward (orthogonal to the cylinder) facing <see cref="SubMesh"/>.</summary>
+		/// <param name="rangeSource">Source for the points.</param>
+		/// <param name="scale">
+		/// Scaling of the perimeter. <see cref="Vector2.x"/> is the angle of the shield. <see cref="Vector2.y"/> is the
+		/// height of the shield.
+		/// </param>
+		/// <param name="radius">Radius of the cylinder for the mesh.</param>
+		/// <param name="offset">
+		/// Offset of the shield. Allows creation of only left or right part of a cylindrical mesh.Default is 0f.
+		/// </param>
+		/// <param name="inside">
+		/// <c>true</c> if the triangles should face outward of the cylinder, <c>false</c> otherwise.
+		/// </param>
+		/// <returns>A <see cref="SubMesh"/> with the mesh.</returns>
+		public static SubMesh GenerateOrthogonal(IRangeSource rangeSource, Vector2 scale, float radius = 1f, float offset = 0f, bool inside = false) {
 			List<Vector3> points = new List<Vector3>(rangeSource.Resolution * 2 + 1);
 			List<int> triangleIndices = new List<int>();
 
@@ -98,11 +128,11 @@ namespace EquipmentGenerator {
 				if (oldPoints.Count > 0) {
 					if (newPoints.Count == 2) {
 						if (oldPoints.Count == 2) {
-							triangleIndices.AddTriangle(offsetOld, offsetOld + 1, offsetNew + 1, flip);
+							triangleIndices.AddTriangle(offsetOld, offsetOld + 1, offsetNew + 1, inside);
 						}
-						triangleIndices.AddTriangle(offsetOld, offsetNew + 1, offsetNew, flip);
+						triangleIndices.AddTriangle(offsetOld, offsetNew + 1, offsetNew, inside);
 					} else {
-						triangleIndices.AddTriangle(offsetOld, offsetOld + 1, offsetNew, flip);
+						triangleIndices.AddTriangle(offsetOld, offsetOld + 1, offsetNew, inside);
 					}
 				}
 

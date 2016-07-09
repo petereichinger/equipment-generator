@@ -5,8 +5,8 @@ using UnityEngine;
 namespace EquipmentGenerator {
 
 	/// <summary>
-	/// Interface for a point source that can be used in <see cref="CylindricalMeshGenerator.Generate"/>. Range sources
-	/// return a range with the minimum and maximum always in the range [0:1].
+	/// Interface for a point source that can be used in <see cref="CylindricalMeshGenerator.GenerateOrthogonal"/>. Range
+	/// sources return a range with the minimum and maximum always in the range [0:1].
 	/// </summary>
 	public interface IRangeSource {
 
