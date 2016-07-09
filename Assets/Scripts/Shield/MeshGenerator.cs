@@ -9,6 +9,30 @@ namespace EquipmentGenerator {
 		void Overlay(List<Vector3> points);
 	}
 
+	/// <summary>Flat overlay shape that just scales and has a normalized offset.</summary>
+	public class FlatOverlayShape : IOverlayShape {
+		private readonly Vector2 _scale;
+		private readonly float _offset;
+
+		/// <summary>Create a new FlatOverlayShape.</summary>
+		/// <param name="scale">Scaling.</param>
+		/// <param name="offset">Optional normalized offset.</param>
+		public FlatOverlayShape(Vector2 scale, float offset = 0f) {
+			_scale = scale;
+			_offset = offset;
+		}
+
+		public void Overlay(List<Vector3> points) {
+			for (int i = 0; i < points.Count; i++) {
+				var point = points[i];
+				point.x -= _offset + 0.5f;
+				point.Scale(new Vector3(_scale.x, _scale.y, 1f));
+
+				points[i] = point;
+			}
+		}
+	}
+
 	/// <summary>Overlay shape that angles the mesh with a corner in the center.</summary>
 	public class AngledOverlayShape : IOverlayShape {
 		private readonly float _gradient;
