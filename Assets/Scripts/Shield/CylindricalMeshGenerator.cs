@@ -118,22 +118,31 @@ namespace EquipmentGenerator {
 			return new SubMesh(points, triangleIndices);
 		}
 
+		/// <summary>
+		/// Modifies <paramref name="points"/> so that they are on a y-axis cylinder with the radius <paramref
+		/// name="radius"/>.
+		/// </summary>
+		/// <param name="points">Points to overlay on the cylinder.</param>
+		/// <param name="scale">
+		/// Scaling. <see cref="Vector2.x"/> is the angle of the mesh. <see cref="Vector2.y"/> is the height of the mesh.
+		/// </param>
+		/// <param name="radius">Radius of the cylinder in Unity length-units. Must be greater than 0.</param>
+		/// <param name="offset">
+		/// Normalized offset of the points. Use this to create only left or right part of the cylinder.
+		/// </param>
 		private static void OverlayOnCylinder(List<Vector3> points, Vector2 scale, float radius, float offset) {
 			// Scale and move points
-
-			// float sqrRadius = Mathf.Pow(radius, 2);
+			if (radius <= 0f) {
+				Debug.LogError("radius must be > 0");
+				return;
+			}
 
 			for (int i = 0; i < points.Count; i++) {
 				var point = points[i];
 
 				point.x -= offset + 0.5f;
 
-				float realWidth;
-				if (radius > 0f) {
-					realWidth = (radius - point.z) * Mathf.Deg2Rad * scale.x;
-				} else {
-					realWidth = scale.x;
-				}
+				float realWidth = (radius - point.z) * Mathf.Deg2Rad * scale.x;
 
 				point.Scale(new Vector3(realWidth, scale.y, 1f));
 
