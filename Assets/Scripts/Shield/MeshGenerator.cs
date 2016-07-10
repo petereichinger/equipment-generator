@@ -106,7 +106,7 @@ namespace EquipmentGenerator {
 			Tuple<Vector2?, Vector2?> newValues = new Tuple<Vector2?, Vector2?>(null, null);
 
 			for (int i = 0; i <= source.Resolution; i++) {
-				newValues.Clear();
+				newValues.Assign();
 
 				var fraction = (float)i / source.Resolution;
 				newValues.Value1 = source.GetLowerPoint(fraction);
