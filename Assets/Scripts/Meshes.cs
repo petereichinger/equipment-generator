@@ -13,9 +13,10 @@ namespace EquipmentGenerator {
 		/// </summary>
 		/// <param name="vertices">List of vertices.</param>
 		/// <param name="pointTuple">Tuple to add.</param>
-		public static void AddPointTuple(this List<Vector3> vertices, Tuple<Vector2?, Vector2?> pointTuple) {
-			vertices.AddPoint(pointTuple.Value1);
-			vertices.AddPoint(pointTuple.Value2);
+		/// <param name="z">Z value for the vertices. Default is <c>0f</c>.</param>
+		public static void AddPointTuple(this List<Vector3> vertices, Tuple<Vector2?, Vector2?> pointTuple, float z = 0f) {
+			vertices.AddPoint(pointTuple.Value1, z);
+			vertices.AddPoint(pointTuple.Value2, z);
 		}
 
 		/// <summary>
@@ -24,9 +25,10 @@ namespace EquipmentGenerator {
 		/// </summary>
 		/// <param name="vertices">List of vertices.</param>
 		/// <param name="point">Point to add. If <c>null</c> it wont be added.</param>
-		public static void AddPoint(this List<Vector3> vertices, Vector2? point) {
+		/// <param name="z">Z value for the vertex. Default is <c>0f</c>.</param>
+		public static void AddPoint(this List<Vector3> vertices, Vector2? point, float z = 0f) {
 			if (point.HasValue) {
-				vertices.Add(point.Value);
+				vertices.Add(new Vector3(point.Value.x, point.Value.y, z));
 			}
 		}
 
