@@ -30,31 +30,7 @@ public class ShieldMeshGenerator {
 			}
 			int oldOffset = verts.Count;
 			int newOffset = oldOffset + 2 * Tuple.NullableHasValueCount(oldValues);
-			if (oldValues.Value1.HasValue) {
-				if (oldValues.Value2.HasValue) {
-					// Both old values are set.
-
-					if (newValues.Value2.HasValue) {
-						// New values has two values as well
-						tris.AddTriangle(oldOffset, oldOffset + 1, newOffset);
-						tris.AddTriangle(oldOffset + 1, newOffset + 1, newOffset);
-
-						tris.AddTriangle(oldOffset + 2, oldOffset + 3, newOffset + 2, true);
-						tris.AddTriangle(oldOffset + 3, newOffset + 3, newOffset + 2, true);
-					} else {
-						// New values only has one value
-						tris.AddTriangle(oldOffset, oldOffset + 1, newOffset);
-						tris.AddTriangle(oldOffset + 2, oldOffset + 3, newOffset + 1, true);
-					}
-				} else {
-					if (newValues.Value2.HasValue) {
-						// New values has two values, old values just one
-						tris.AddTriangle(oldOffset, newOffset + 1, newOffset);
-						tris.AddTriangle(oldOffset + 1, newOffset + 3, newOffset + 2, true);
-					}
-				}
-			}
-
+			GenerateTriangles(oldValues, newValues, tris, oldOffset, newOffset);
 			verts.AddPointTuple(oldValues);
 			verts.AddPointTuple(oldValues, depth);
 			oldValues.CopyFrom(newValues);
@@ -66,5 +42,67 @@ public class ShieldMeshGenerator {
 		verts.AddPointTuple(oldValues, depth);
 		overlayShape.Overlay(verts);
 		return new SubMesh(verts, tris);
+	}
+
+	private static void GenerateTriangles(Tuple<Vector2?, Vector2?> oldValues, Tuple<Vector2?, Vector2?> newValues, List<int> tris, int oldOffset, int newOffset) {
+		if (oldValues.Value1.HasValue) {
+			if (oldValues.Value2.HasValue) {
+				// Both old values are set.
+
+				if (newValues.Value2.HasValue) {
+					// New values has two values as well
+
+					// Front
+					tris.AddTriangle(oldOffset, oldOffset + 1, newOffset);
+					tris.AddTriangle(oldOffset + 1, newOffset + 1, newOffset);
+
+					// Top
+					tris.AddTriangle(oldOffset + 1, oldOffset + 3, newOffset + 1);
+					tris.AddTriangle(oldOffset + 3, newOffset + 3, newOffset + 1);
+
+					// Back
+					tris.AddTriangle(oldOffset + 2, oldOffset + 3, newOffset + 2, true);
+					tris.AddTriangle(oldOffset + 3, newOffset + 3, newOffset + 2, true);
+
+					// Bottom
+					tris.AddTriangle(oldOffset, oldOffset + 2, newOffset, true);
+					tris.AddTriangle(oldOffset + 2, newOffset + 2, newOffset, true);
+				} else {
+					// New values only has one value
+
+					//Front
+					tris.AddTriangle(oldOffset, oldOffset + 1, newOffset);
+
+					// Top
+					tris.AddTriangle(oldOffset + 1, oldOffset + 3, newOffset);
+					tris.AddTriangle(oldOffset + 3, newOffset + 1, newOffset);
+
+					// Back
+					tris.AddTriangle(oldOffset + 2, oldOffset + 3, newOffset + 1, true);
+
+					// Bottom
+					tris.AddTriangle(oldOffset, oldOffset + 2, newOffset, true);
+					tris.AddTriangle(oldOffset + 2, newOffset + 1, newOffset, true);
+				}
+			} else {
+				if (newValues.Value2.HasValue) {
+					// New values has two values, old values just one
+
+					//Front
+					tris.AddTriangle(oldOffset, newOffset + 1, newOffset);
+
+					// Top
+					tris.AddTriangle(oldOffset, oldOffset + 1, newOffset + 1);
+					tris.AddTriangle(oldOffset + 1, newOffset + 3, newOffset + 1);
+
+					// Back
+					tris.AddTriangle(oldOffset + 1, newOffset + 3, newOffset + 2, true);
+
+					// Bottom
+					tris.AddTriangle(oldOffset, oldOffset + 1, newOffset, true);
+					tris.AddTriangle(oldOffset + 1, newOffset + 2, newOffset, true);
+				}
+			}
+		}
 	}
 }
