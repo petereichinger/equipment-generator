@@ -37,7 +37,9 @@ public class ShieldMeshGenerator {
 			newValues.Assign();
 			value += step;
 		}
-
+		int offset = verts.Count;
+		tris.AddTriangle(offset, offset + 1, offset + 2);
+		tris.AddTriangle(offset + 2, offset + 1, offset + 3);
 		verts.AddPointTuple(oldValues);
 		verts.AddPointTuple(oldValues, depth);
 		overlayShape.Overlay(verts);
@@ -103,6 +105,9 @@ public class ShieldMeshGenerator {
 					tris.AddTriangle(oldOffset + 1, newOffset + 2, newOffset, true);
 				}
 			}
+		} else {
+			tris.AddTriangle(oldOffset, oldOffset + 2, oldOffset + 1);
+			tris.AddTriangle(oldOffset + 2, oldOffset + 3, oldOffset + 1);
 		}
 	}
 }
