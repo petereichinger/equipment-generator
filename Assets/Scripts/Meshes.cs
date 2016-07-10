@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -7,8 +8,19 @@ namespace EquipmentGenerator {
 	public static class MeshHelpers {
 
 		/// <summary>
+		/// Add a <see cref="Tuple{T1,T2}"/> to the vertices List. Both Tuple values must be of type <see
+		/// cref="Nullable{T}"/> ( <see cref="Vector2"/>).
+		/// </summary>
+		/// <param name="vertices">List of vertices.</param>
+		/// <param name="pointTuple">Tuple to add.</param>
+		public static void AddPointTuple(this List<Vector3> vertices, Tuple<Vector2?, Vector2?> pointTuple) {
+			vertices.AddPoint(pointTuple.Value1);
+			vertices.AddPoint(pointTuple.Value2);
+		}
+
+		/// <summary>
 		/// Add a <see cref="System.Nullable{T}"/> ( <see cref="Vector2"/>) to the list of vertices. If the point is <c>
-		/// null </c> it will not be added.
+		/// null</c> it will not be added.
 		/// </summary>
 		/// <param name="vertices">List of vertices.</param>
 		/// <param name="point">Point to add. If <c>null</c> it wont be added.</param>
