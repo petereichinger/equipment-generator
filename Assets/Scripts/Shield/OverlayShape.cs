@@ -25,7 +25,7 @@ namespace EquipmentGenerator {
 		public void Overlay(List<Vector3> points) {
 			for (int i = 0; i < points.Count; i++) {
 				var point = points[i];
-				point.x -= _offset + 0.5f;
+				point.x -= _offset;
 				point.Scale(new Vector3(_scale.x, _scale.y, 1f));
 
 				points[i] = point;
@@ -52,7 +52,7 @@ namespace EquipmentGenerator {
 		public void Overlay(List<Vector3> points) {
 			for (int i = 0; i < points.Count; i++) {
 				var point = points[i];
-				point.x -= _offset + 0.5f;
+				point.x -= _offset;
 
 				point.Scale(new Vector3(_scale.x, _scale.y, 1f));
 
@@ -93,7 +93,7 @@ namespace EquipmentGenerator {
 			for (int i = 0; i < points.Count; i++) {
 				var point = points[i];
 
-				point.x -= _offset + 0.5f;
+				point.x -= _offset;
 
 				float realWidth = (_radius - point.z) * Mathf.Deg2Rad * _scale.x;
 
