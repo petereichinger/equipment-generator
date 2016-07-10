@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ShieldMeshGenerator {
 
-	public SubMesh GenerateShield(System.Func<float, float> upperFunction, System.Func<float, float> lowerFunction, IOverlayShape overlayShape,
+	public static SubMesh GenerateShield(System.Func<float, float> upperFunction, System.Func<float, float> lowerFunction, IOverlayShape overlayShape,
 		int resolution,
 		float leftMargin = -0.5f, float rightMargin = 0.5f) {
 		var verts = new List<Vector3>();
@@ -15,7 +15,7 @@ public class ShieldMeshGenerator {
 		float step = (rightMargin - leftMargin) / resolution;
 		var oldValues = new Tuple<Vector2?, Vector2?>();
 		var newValues = new Tuple<Vector2?, Vector2?>();
-		for (int i = 0; i < resolution; i++) {
+		for (int i = 0; i <= resolution; i++) {
 			float lowerY = lowerFunction(value);
 			float upperY = upperFunction(value);
 
@@ -37,7 +37,7 @@ public class ShieldMeshGenerator {
 
 					if (newValues.Value2.HasValue) {
 						// New values has two values as well
-						tris.AddTriangle(oldOffset, newOffset + 1, newOffset);
+						tris.AddTriangle(oldOffset + 1, newOffset + 1, newOffset);
 					}
 				} else {
 					if (newValues.Value2.HasValue) {
@@ -46,9 +46,9 @@ public class ShieldMeshGenerator {
 					}
 				}
 			}
-			if (Tuple.NullableHasValueCount(oldValues) == 2 || Tuple.NullableHasValueCount(newValues) == 2) {
-				verts.AddPointTuple(oldValues);
-			}
+
+			verts.AddPointTuple(oldValues);
+
 			oldValues.CopyFrom(newValues);
 			newValues.Assign();
 			value += step;
