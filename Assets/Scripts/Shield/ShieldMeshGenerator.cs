@@ -5,6 +5,19 @@ using UnityEngine;
 
 public class ShieldMeshGenerator {
 
+	/// <summary>Generate a shield like mesh.</summary>
+	/// <param name="upperFunction">Function for the upper outline of the shield.</param>
+	/// <param name="lowerFunction">Function for the lower outline of the shield.</param>
+	/// <param name="overlayShape">A shape to overlay the vertices over.</param>
+	/// <param name="resolution">Number of cells on the x-axis.</param>
+	/// <param name="depth">Depth of the shield.</param>
+	/// <param name="leftMargin">
+	/// Optional left margin for the shield. This is the first x value that will be evaluated.
+	/// </param>
+	/// <param name="rightMargin">
+	/// Optional right margin for the shield. This is the last x value that will be evaluated.
+	/// </param>
+	/// <returns>A <see cref="SubMesh"/> with the vertices and triangles of the shield.</returns>
 	public static SubMesh GenerateShield(System.Func<float, float> upperFunction, System.Func<float, float> lowerFunction, IOverlayShape overlayShape,
 		int resolution, float depth,
 		float leftMargin = -0.5f, float rightMargin = 0.5f) {
