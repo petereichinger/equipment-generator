@@ -6,16 +6,19 @@ using UnityEngine;
 public class ShieldMeshGenerator {
 
 	public static SubMesh GenerateCircular(System.Func<float, float> innerBound, System.Func<float, float> outerBound,
-		IOverlayShape shape, int resolution, float depth) {
+		IOverlayShape shape, int resolution, float depth, int subdivisions) {
 		var verts = new List<Vector3>();
 		var tris = new List<int>();
+
+		float subDivStep = 1f / subdivisions;
 
 		float step = 2 * Mathf.PI / resolution;
 		float value = 0f;
 
 		var oldValues = new Tuple<Vector2?, Vector2?>();
 		var newValues = new Tuple<Vector2?, Vector2?>();
-		for (int i = 0; i <= resolution; i++) {
+		Tuple<Vector2?, Vector2?> startValues = null;
+		for (int i = 0; i < resolution; i++) {
 			float inner = innerBound(value);
 			float outer = outerBound(value);
 
@@ -29,32 +32,47 @@ public class ShieldMeshGenerator {
 			if (!(Mathf.Approximately(innerx, outerx) && Mathf.Approximately(innery, outery))) {
 				newValues.Value2 = new Vector2(outerx, outery);
 			}
-			int oldOffset = verts.Count;
-			int newOffset = oldOffset + Tuple.NullableHasValueCount(oldValues);
-			if (Tuple.NullableHasValueCount(oldValues) > 0) {
-				if (Tuple.NullableHasValueCount(newValues) == 2) {
-					if (oldValues.Value2.HasValue) {
-						tris.AddTriangle(newOffset, newOffset + 1, oldOffset);
-						tris.AddTriangle(oldOffset, newOffset + 1, oldOffset + 1);
-					} else {
-						tris.AddTriangle(newOffset, newOffset + 1, oldOffset);
-					}
-				} else {
-					if (Tuple.NullableHasValueCount(oldValues) == 2) {
-						tris.AddTriangle(oldOffset, newOffset, oldOffset + 1);
-					}
-				}
+			if (startValues == null) {
+				startValues = new Tuple<Vector2?, Vector2?>(newValues.Value1, newValues.Value2);
 			}
-			verts.AddPointTuple(oldValues);
+			int oldOffset = verts.Count;
+			int newOffset = oldOffset + subdivisions + 1;
+			GenerateRoundMeshPart(verts, tris, subdivisions, oldValues, newValues, subDivStep, oldOffset, newOffset);
 			oldValues.CopyFrom(newValues);
-
 			newValues.Clear();
 			value += step;
 		}
+		if (Tuple.BothNotNull(oldValues)) {
+			GenerateRoundMeshPart(verts, tris, subdivisions, oldValues, startValues, subDivStep, verts.Count, 0);
+		}
 
-		verts.AddPointTuple(oldValues);
 		shape.Overlay(verts);
 		return new SubMesh(verts, tris);
+	}
+
+	private static void GenerateRoundMeshPart(List<Vector3> verts, List<int> tris, int subdivisions, Tuple<Vector2?, Vector2?> oldValues, Tuple<Vector2?, Vector2?> newValues, float subDivStep,
+		int oldOffset, int newOffset) {
+		if (oldValues.Value1.HasValue) {
+			Vector2 oldStart = oldValues.Value2.HasValue ? oldValues.Value1.Value : newValues.Value1.Value;
+			Vector2 oldEnd = oldValues.Value2.HasValue ? oldValues.Value2.Value : oldValues.Value1.Value;
+			bool triangle = !oldValues.Value2.HasValue || !newValues.Value2.HasValue;
+
+			for (int j = 0; j < subdivisions; j++) {
+				float t = j * subDivStep;
+
+				Vector2 oldPos = Vector2.Lerp(oldStart, oldEnd, t);
+
+				if (triangle && j == 0) {
+					tris.AddTriangle(oldOffset, newOffset + 1, oldOffset + 1);
+				} else {
+					tris.AddTriangle(oldOffset + j, newOffset + j, newOffset + j + 1);
+					tris.AddTriangle(oldOffset + j, newOffset + j + 1, oldOffset + j + 1);
+				}
+
+				verts.AddPoint(oldPos);
+			}
+			verts.AddPoint(oldEnd);
+		}
 	}
 
 	/// <summary>Generate a shield like mesh.</summary>
