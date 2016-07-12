@@ -5,6 +5,58 @@ using UnityEngine;
 
 public class ShieldMeshGenerator {
 
+	public static SubMesh GenerateCircular(System.Func<float, float> innerBound, System.Func<float, float> outerBound,
+		IOverlayShape shape, int resolution, float depth) {
+		var verts = new List<Vector3>();
+		var tris = new List<int>();
+
+		float step = 2 * Mathf.PI / resolution;
+		float value = 0f;
+
+		var oldValues = new Tuple<Vector2?, Vector2?>();
+		var newValues = new Tuple<Vector2?, Vector2?>();
+		for (int i = 0; i <= resolution; i++) {
+			float inner = innerBound(value);
+			float outer = outerBound(value);
+
+			Math.SwapIfGreater(ref inner, ref outer);
+
+			float innery = inner * Mathf.Sin(value);
+			float innerx = inner * Mathf.Cos(value);
+			float outery = outer * Mathf.Sin(value);
+			float outerx = outer * Mathf.Cos(value);
+			newValues.Value1 = new Vector2(innerx, innery);
+			if (!(Mathf.Approximately(innerx, outerx) && Mathf.Approximately(innery, outery))) {
+				newValues.Value2 = new Vector2(outerx, outery);
+			}
+			int oldOffset = verts.Count;
+			int newOffset = oldOffset + Tuple.NullableHasValueCount(oldValues);
+			if (Tuple.NullableHasValueCount(oldValues) > 0) {
+				if (Tuple.NullableHasValueCount(newValues) == 2) {
+					if (oldValues.Value2.HasValue) {
+						tris.AddTriangle(newOffset, newOffset + 1, oldOffset);
+						tris.AddTriangle(oldOffset, newOffset + 1, oldOffset + 1);
+					} else {
+						tris.AddTriangle(newOffset, newOffset + 1, oldOffset);
+					}
+				} else {
+					if (Tuple.NullableHasValueCount(oldValues) == 2) {
+						tris.AddTriangle(oldOffset, newOffset, oldOffset + 1);
+					}
+				}
+			}
+			verts.AddPointTuple(oldValues);
+			oldValues.CopyFrom(newValues);
+
+			newValues.Clear();
+			value += step;
+		}
+
+		verts.AddPointTuple(oldValues);
+		shape.Overlay(verts);
+		return new SubMesh(verts, tris);
+	}
+
 	/// <summary>Generate a shield like mesh.</summary>
 	/// <param name="upperBound">Function for the upper bound of the shield.</param>
 	/// <param name="lowerBound">Function for the lower bound of the shield.</param>
