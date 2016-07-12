@@ -6,31 +6,31 @@ using UnityEngine;
 public class ShieldMeshGenerator {
 
 	/// <summary>Generate a shield like mesh.</summary>
-	/// <param name="upperFunction">Function for the upper outline of the shield.</param>
-	/// <param name="lowerFunction">Function for the lower outline of the shield.</param>
+	/// <param name="upperBound">Function for the upper bound of the shield.</param>
+	/// <param name="lowerBound">Function for the lower bound of the shield.</param>
 	/// <param name="overlayShape">A shape to overlay the vertices over.</param>
 	/// <param name="resolution">Number of cells on the x-axis.</param>
 	/// <param name="depth">Depth of the shield.</param>
-	/// <param name="leftMargin">
+	/// <param name="leftBound">
 	/// Optional left margin for the shield. This is the first x value that will be evaluated.
 	/// </param>
-	/// <param name="rightMargin">
+	/// <param name="rightBound">
 	/// Optional right margin for the shield. This is the last x value that will be evaluated.
 	/// </param>
 	/// <returns>A <see cref="SubMesh"/> with the vertices and triangles of the shield.</returns>
-	public static SubMesh GenerateShield(System.Func<float, float> upperFunction, System.Func<float, float> lowerFunction, IOverlayShape overlayShape,
+	public static SubMesh GenerateLowerUpperBound(System.Func<float, float> upperBound, System.Func<float, float> lowerBound, IOverlayShape overlayShape,
 		int resolution, float depth,
-		float leftMargin = -0.5f, float rightMargin = 0.5f) {
+		float leftBound = -0.5f, float rightBound = 0.5f) {
 		var verts = new List<Vector3>();
 		var tris = new List<int>();
 
-		float value = leftMargin;
-		float step = (rightMargin - leftMargin) / resolution;
+		float value = leftBound;
+		float step = (rightBound - leftBound) / resolution;
 		var oldValues = new Tuple<Vector2?, Vector2?>();
 		var newValues = new Tuple<Vector2?, Vector2?>();
 		for (int i = 0; i <= resolution; i++) {
-			float lowerY = lowerFunction(value);
-			float upperY = upperFunction(value);
+			float lowerY = lowerBound(value);
+			float upperY = upperBound(value);
 
 			if (lowerY > upperY) {
 				float temp = lowerY;
