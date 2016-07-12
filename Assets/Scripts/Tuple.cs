@@ -31,10 +31,10 @@ public class Tuple<T1, T2> {
 		Value2 = val2;
 	}
 
-	/// <summary>Assign values for <see cref="Value1"/> and <see cref="Value2"/>.</summary>
-	/// <param name="val1">Value for <see cref="Value1"/>. Default is <c>default(T1)</c>.</param>
-	/// <param name="val2">Value for <see cref="Value2"/>. Default is <c>default(T2)</c>.</param>
-	public void Assign(T1 val1 = default(T1), T2 val2 = default(T2)) {
+	/// <summary>
+	/// Clear the tuple. This assigns <c>default(T)</c> to <see cref="Value1"/> and <see cref="Value2"/>.
+	/// </summary>
+	public void Clear() {
 		Value1 = default(T1);
 		Value2 = default(T2);
 	}

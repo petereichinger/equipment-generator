@@ -47,7 +47,7 @@ public class ShieldMeshGenerator {
 			verts.AddPointTuple(oldValues);
 			verts.AddPointTuple(oldValues, depth);
 			oldValues.CopyFrom(newValues);
-			newValues.Assign();
+			newValues.Clear();
 			value += step;
 		}
 		int offset = verts.Count;
