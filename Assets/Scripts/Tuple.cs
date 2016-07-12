@@ -72,6 +72,17 @@ public class Tuple<T1, T2, T3> {
 /// <summary>Helper class for creating tuples. Just use <c>Tuple.Create(...)</c>.</summary>
 public static class Tuple {
 
+	/// <summary>Check if both values of a Tuple with nullable values are set.</summary>
+	/// <typeparam name="T1">Type <typeparamref name="T1"/> of <see cref="Tuple{T1,T2}"/>.</typeparam>
+	/// <typeparam name="T2">Type <typeparamref name="T2"/> of <see cref="Tuple{T1,T2}"/>.</typeparam>
+	/// <param name="tuple">Tuple to check.</param>
+	/// <returns><c>true</c> if both values are set, <c>false</c> otherwise.</returns>
+	public static bool BothNotNull<T1, T2>(Tuple<T1?, T2?> tuple)
+		where T1 : struct
+		where T2 : struct {
+		return tuple.Value1.HasValue && tuple.Value2.HasValue;
+	}
+
 	/// <summary>
 	/// Get a number representing the number of values that are not null in <paramref name="tuple"/>. <c>0</c> if both
 	/// <see cref="Tuple{T1,T2}.Value1"/> and <see cref="Tuple{T1,T2}.Value2"/> have no value, <c>1</c> if either <see
