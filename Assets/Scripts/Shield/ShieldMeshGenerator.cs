@@ -51,8 +51,12 @@ public class ShieldMeshGenerator {
 			value += step;
 		}
 		int offset = verts.Count;
-		tris.AddTriangle(offset, offset + 1, offset + 2);
-		tris.AddTriangle(offset + 2, offset + 1, offset + 3);
+		if (Tuple.NullableHasValueCount(oldValues) == 2) {
+			// Only add right side triangles if there are two end values
+			tris.AddTriangle(offset, offset + 1, offset + 2);
+			tris.AddTriangle(offset + 2, offset + 1, offset + 3);
+		}
+
 		verts.AddPointTuple(oldValues);
 		verts.AddPointTuple(oldValues, depth);
 		overlayShape.Overlay(verts);
@@ -119,8 +123,11 @@ public class ShieldMeshGenerator {
 				}
 			}
 		} else {
-			tris.AddTriangle(oldOffset, oldOffset + 2, oldOffset + 1);
-			tris.AddTriangle(oldOffset + 2, oldOffset + 3, oldOffset + 1);
+			if (newValues.Value1.HasValue && newValues.Value2.HasValue) {
+				// Only add left side triangles if there are two values at the beginning.
+				tris.AddTriangle(oldOffset, oldOffset + 2, oldOffset + 1);
+				tris.AddTriangle(oldOffset + 2, oldOffset + 3, oldOffset + 1);
+			}
 		}
 	}
 }
