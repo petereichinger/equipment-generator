@@ -1,13 +1,20 @@
 ﻿using EquipmentGenerator;
-
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ShieldMeshGenerator {
 
-	public static SubMesh GenerateCircular(System.Func<float, float> innerBound, System.Func<float, float> outerBound,
-		IOverlayShape shape, int resolution, float depth, int subdivisions) {
+	/// <summary>Generate a round shield with two polar functions.</summary>
+	/// <param name="innerBound">The inner bound polar function for the shield.</param>
+	/// <param name="outerBound">The outer bound polar function for the shield.</param>
+	/// <param name="shape">An overlay shape to overlay the shield onto.</param>
+	/// <param name="resolution">Number of segements the shield will consist of.</param>
+	/// <param name="subdivisions">Number of subdivisions of each shield.</param>
+	/// <param name="depth">The depth of the shield.</param>
+	/// <returns>A <see cref="SubMesh"/> representing the shield.</returns>
+	public static SubMesh GeneratePolar(Func<float, float> innerBound, Func<float, float> outerBound, IOverlayShape shape, int resolution, int subdivisions, float depth) {
 		var verts = new List<Vector3>();
 		var tris = new List<int>();
 
