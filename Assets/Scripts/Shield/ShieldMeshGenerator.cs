@@ -1,4 +1,5 @@
 ﻿using EquipmentGenerator;
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,8 +11,6 @@ public class ShieldMeshGenerator {
 		var verts = new List<Vector3>();
 		var tris = new List<int>();
 
-		float subDivStep = 1f / subdivisions;
-
 		float step = 2 * Mathf.PI / resolution;
 		float value = 0f;
 
@@ -22,7 +21,7 @@ public class ShieldMeshGenerator {
 			float inner = innerBound(value);
 			float outer = outerBound(value);
 
-			Math.SwapIfGreater(ref inner, ref outer);
+			EquipmentGenerator.Math.SwapIfGreater(ref inner, ref outer);
 
 			float innery = inner * Mathf.Sin(value);
 			float innerx = inner * Mathf.Cos(value);
@@ -35,24 +34,27 @@ public class ShieldMeshGenerator {
 			if (startValues == null) {
 				startValues = new Tuple<Vector2?, Vector2?>(newValues.Value1, newValues.Value2);
 			}
-			int oldOffset = verts.Count;
-			int newOffset = oldOffset + subdivisions + 1;
-			GenerateRoundMeshPart(verts, tris, subdivisions, oldValues, newValues, subDivStep, oldOffset, newOffset);
+
+			GenerateShieldSegment(verts, tris, subdivisions, oldValues, newValues, i, resolution);
 			oldValues.CopyFrom(newValues);
 			newValues.Clear();
 			value += step;
 		}
 		if (Tuple.BothNotNull(oldValues)) {
-			GenerateRoundMeshPart(verts, tris, subdivisions, oldValues, startValues, subDivStep, verts.Count, 0);
+			GenerateShieldSegment(verts, tris, subdivisions, oldValues, startValues, resolution, resolution);
 		}
 
 		shape.Overlay(verts);
 		return new SubMesh(verts, tris);
 	}
 
-	private static void GenerateRoundMeshPart(List<Vector3> verts, List<int> tris, int subdivisions, Tuple<Vector2?, Vector2?> oldValues, Tuple<Vector2?, Vector2?> newValues, float subDivStep,
-		int oldOffset, int newOffset) {
+	private static void GenerateShieldSegment(List<Vector3> verts, List<int> tris, int subdivisions, Tuple<Vector2?, Vector2?> oldValues, Tuple<Vector2?, Vector2?> newValues,
+		int segment, int resolution) {
 		if (oldValues.Value1.HasValue) {
+			float subDivStep = 1f / subdivisions;
+			int oldOffset = verts.Count;
+			int newOffset = segment < resolution ? oldOffset + subdivisions + 1 : 0;
+
 			Vector2 oldStart = oldValues.Value2.HasValue ? oldValues.Value1.Value : newValues.Value1.Value;
 			Vector2 oldEnd = oldValues.Value2.HasValue ? oldValues.Value2.Value : oldValues.Value1.Value;
 			bool triangle = !oldValues.Value2.HasValue || !newValues.Value2.HasValue;
