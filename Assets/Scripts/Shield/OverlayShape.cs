@@ -9,7 +9,36 @@ namespace EquipmentGenerator {
 		void Overlay(List<Vector3> points);
 	}
 
-	/// <summary>Overlay shape of</summary>
+	public class PyramidOverlayShape : IOverlayShape {
+		private readonly float _gradient;
+		private readonly Vector2 _scale;
+		private readonly float _offset;
+
+		/// <summary>Create a new overlay shape.</summary>
+		/// <param name="gradient">Gradient of the pyramid.</param>
+		/// <param name="scale">Scaling.</param>
+		/// <param name="offset">Normalized offset for the overlay shape.</param>
+		public PyramidOverlayShape(float gradient, Vector2 scale, float offset = 0f) {
+			_gradient = gradient;
+			_scale = scale;
+			_offset = offset;
+		}
+
+		public void Overlay(List<Vector3> points) {
+			for (int i = 0; i < points.Count; i++) {
+				var point = points[i];
+				point.x -= _offset;
+
+				point.Scale(new Vector3(_scale.x, _scale.y, 1f));
+				float offsetX = Mathf.Abs(_gradient * point.x);
+				float offsetY = Mathf.Abs(_gradient * point.y);
+				point.z += Mathf.Max(offsetX, offsetY);
+				points[i] = point;
+			}
+		}
+	}
+
+	/// <summary>Spherical overlay shape.</summary>
 	public class SphereOverlayShape : IOverlayShape {
 		private readonly float _scale;
 		private readonly float _radius;
