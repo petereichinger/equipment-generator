@@ -10,21 +10,21 @@ public class ShieldMeshGenerator {
 	/// <param name="innerBound">The inner bound polar function for the shield.</param>
 	/// <param name="outerBound">The outer bound polar function for the shield.</param>
 	/// <param name="shape">An overlay shape to overlay the shield onto.</param>
-	/// <param name="resolution">Number of segements the shield will consist of.</param>
+	/// <param name="numberOfSegments">Number of segements the shield will consist of.</param>
 	/// <param name="subdivisions">Number of subdivisions of each shield.</param>
 	/// <param name="depth">The depth of the shield.</param>
 	/// <returns>A <see cref="SubMesh"/> representing the shield.</returns>
-	public static SubMesh GeneratePolar(Func<float, float> innerBound, Func<float, float> outerBound, IOverlayShape shape, int resolution, int subdivisions, float depth) {
+	public static SubMesh GeneratePolar(Func<float, float> innerBound, Func<float, float> outerBound, IOverlayShape shape, int numberOfSegments, int subdivisions, float depth) {
 		var verts = new List<Vector3>();
 		var tris = new List<int>();
 
-		float step = 2 * Mathf.PI / resolution;
+		float step = 2 * Mathf.PI / numberOfSegments;
 		float value = 0f;
 
 		var oldValues = new Tuple<Vector2?, Vector2?>();
 		var newValues = new Tuple<Vector2?, Vector2?>();
 		Tuple<Vector2?, Vector2?> startValues = null;
-		for (int i = 0; i < resolution; i++) {
+		for (int i = 0; i < numberOfSegments; i++) {
 			float inner = innerBound(value);
 			float outer = outerBound(value);
 
@@ -42,45 +42,56 @@ public class ShieldMeshGenerator {
 				startValues = new Tuple<Vector2?, Vector2?>(newValues.Value1, newValues.Value2);
 			}
 
-			GenerateShieldSegment(verts, tris, subdivisions, oldValues, newValues, i, resolution);
+			GenerateShieldSegment(verts, tris, oldValues, newValues, subdivisions, i, numberOfSegments, depth);
 			oldValues.CopyFrom(newValues);
 			newValues.Clear();
 			value += step;
 		}
 		if (Tuple.BothNotNull(oldValues)) {
-			GenerateShieldSegment(verts, tris, subdivisions, oldValues, startValues, resolution, resolution);
+			GenerateShieldSegment(verts, tris, oldValues, startValues, subdivisions, numberOfSegments, numberOfSegments, depth);
 		}
 
 		shape.Overlay(verts);
 		return new SubMesh(verts, tris);
 	}
 
-	private static void GenerateShieldSegment(List<Vector3> verts, List<int> tris, int subdivisions, Tuple<Vector2?, Vector2?> oldValues, Tuple<Vector2?, Vector2?> newValues,
-		int segment, int resolution) {
+	private static void GenerateShieldSegment(List<Vector3> verts, List<int> tris, Tuple<Vector2?, Vector2?> oldValues, Tuple<Vector2?, Vector2?> newValues,
+		int subdivisions, int segment, int numberOfSegments, float depth) {
 		if (oldValues.Value1.HasValue) {
 			float subDivStep = 1f / subdivisions;
 			int oldOffset = verts.Count;
-			int newOffset = segment < resolution ? oldOffset + subdivisions + 1 : 0;
+			int newOffset = segment < numberOfSegments ? oldOffset + 2 * (subdivisions + 1) : 0;
 
 			Vector2 oldStart = oldValues.Value2.HasValue ? oldValues.Value1.Value : newValues.Value1.Value;
 			Vector2 oldEnd = oldValues.Value2.HasValue ? oldValues.Value2.Value : oldValues.Value1.Value;
 			bool triangle = !oldValues.Value2.HasValue || !newValues.Value2.HasValue;
 
-			for (int j = 0; j < subdivisions; j++) {
+			for (int j = 0; j < 2 * subdivisions; j += 2) {
 				float t = j * subDivStep;
 
 				Vector2 oldPos = Vector2.Lerp(oldStart, oldEnd, t);
 
 				if (triangle && j == 0) {
-					tris.AddTriangle(oldOffset, newOffset + 1, oldOffset + 1);
+					// Front
+					tris.AddTriangle(oldOffset, newOffset + 2, oldOffset + 2);
+
+					// Back
+					tris.AddTriangle(oldOffset + 1, newOffset + 3, oldOffset + 3, true);
 				} else {
-					tris.AddTriangle(oldOffset + j, newOffset + j, newOffset + j + 1);
-					tris.AddTriangle(oldOffset + j, newOffset + j + 1, oldOffset + j + 1);
+					// Front
+					tris.AddTriangle(oldOffset + j, newOffset + j, newOffset + j + 2);
+					tris.AddTriangle(oldOffset + j, newOffset + j + 2, oldOffset + j + 2);
+
+					// Back
+					tris.AddTriangle(oldOffset + j + 1, newOffset + j + 1, newOffset + j + 3, true);
+					tris.AddTriangle(oldOffset + j + 1, newOffset + j + 3, oldOffset + j + 3, true);
 				}
 
 				verts.AddPoint(oldPos);
+				verts.AddPoint(oldPos, depth);
 			}
 			verts.AddPoint(oldEnd);
+			verts.AddPoint(oldEnd, depth);
 		}
 	}
 
