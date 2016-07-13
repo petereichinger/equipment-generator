@@ -84,7 +84,7 @@ public class ShieldMeshGenerator {
 		}
 	}
 
-	/// <summary>Generate a shield like mesh.</summary>
+	/// <summary>Generate a shield mesh with two carthesian functions.</summary>
 	/// <param name="upperBound">Function for the upper bound of the shield.</param>
 	/// <param name="lowerBound">Function for the lower bound of the shield.</param>
 	/// <param name="overlayShape">A shape to overlay the vertices over.</param>
@@ -97,7 +97,7 @@ public class ShieldMeshGenerator {
 	/// Optional right margin for the shield. This is the last x value that will be evaluated.
 	/// </param>
 	/// <returns>A <see cref="SubMesh"/> with the vertices and triangles of the shield.</returns>
-	public static SubMesh GenerateLowerUpperBound(System.Func<float, float> upperBound, System.Func<float, float> lowerBound, IOverlayShape overlayShape,
+	public static SubMesh GenerateCarthesian(System.Func<float, float> upperBound, System.Func<float, float> lowerBound, IOverlayShape overlayShape,
 		int resolution, float depth,
 		float leftBound = -0.5f, float rightBound = 0.5f) {
 		var verts = new List<Vector3>();
