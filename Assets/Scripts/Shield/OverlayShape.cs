@@ -9,6 +9,55 @@ namespace EquipmentGenerator {
 		void Overlay(List<Vector3> points);
 	}
 
+	/// <summary>Overlay shape of</summary>
+	public class SphereOverlayShape : IOverlayShape {
+		private readonly float _scale;
+		private readonly float _radius;
+		private readonly float _offset;
+
+		/// <summary>Create a new instance of a <see cref="SphereOverlayShape"/>.</summary>
+		/// <param name="radius">Radius of the sphere.</param>
+		/// <param name="scale"></param>
+		/// <param name="offset">Normalized offset for the overlay shape.</param>
+		public SphereOverlayShape(float radius, float scale, float offset = 0f) {
+			_scale = scale;
+			_radius = radius;
+			_offset = offset;
+		}
+
+		/// <summary>
+		/// Modifies <paramref name="points"/> so that they are on a y-axis cylinder with the radius <see
+		/// cref="_radius"/>
+		/// </summary>
+		/// <param name="points">Points to overlay on the cylinder.</param>
+		public void Overlay(List<Vector3> points) {
+			// Scale and move points
+			if (_radius <= 0f) {
+				Debug.LogError("radius must be > 0");
+				return;
+			}
+
+			for (int i = 0; i < points.Count; i++) {
+				var point = points[i];
+
+				point.x -= _offset;
+
+				float realWidth = (_radius - point.z) * Mathf.Deg2Rad * _scale;
+
+				point.Scale(new Vector3(realWidth, realWidth, 1f));
+
+				float xPow = Mathf.Pow(point.x, 2f);
+				float yPow = Mathf.Pow(point.y, 2f);
+				float sqrRadius = Mathf.Pow(_radius - point.z, 2f);
+				if (sqrRadius > xPow) {
+					float z = -Mathf.Sqrt(sqrRadius - xPow - yPow);
+					point.z = z + _radius;
+				}
+				points[i] = point;
+			}
+		}
+	}
+
 	/// <summary>Flat overlay shape that just scales and has a normalized offset.</summary>
 	public class FlatOverlayShape : IOverlayShape {
 		private readonly Vector2 _scale;
