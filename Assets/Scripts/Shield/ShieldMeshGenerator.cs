@@ -9,12 +9,11 @@ public class ShieldMeshGenerator {
 	/// <summary>Generate a round shield with two polar functions.</summary>
 	/// <param name="innerBound">The inner bound polar function for the shield.</param>
 	/// <param name="outerBound">The outer bound polar function for the shield.</param>
-	/// <param name="shape">An overlay shape to overlay the shield onto.</param>
 	/// <param name="numberOfSegments">Number of segements the shield will consist of.</param>
 	/// <param name="subdivisions">Number of subdivisions of each shield.</param>
 	/// <param name="depth">The depth of the shield.</param>
 	/// <returns>A <see cref="SubMesh"/> representing the shield.</returns>
-	public static SubMesh GeneratePolar(Func<float, float> innerBound, Func<float, float> outerBound, IOverlayShape shape, int numberOfSegments, int subdivisions, float depth) {
+	public static SubMesh GeneratePolar(Func<float, float> innerBound, Func<float, float> outerBound, int numberOfSegments, int subdivisions, float depth) {
 		var verts = new List<Vector3>();
 		var tris = new List<int>();
 
@@ -51,7 +50,6 @@ public class ShieldMeshGenerator {
 			GenerateShieldSegment(verts, tris, oldValues, startValues, subdivisions, numberOfSegments, numberOfSegments, depth);
 		}
 
-		shape.Overlay(verts);
 		return new SubMesh(verts, tris);
 	}
 
@@ -107,7 +105,6 @@ public class ShieldMeshGenerator {
 	/// <summary>Generate a shield mesh with two carthesian functions.</summary>
 	/// <param name="upperBound">Function for the upper bound of the shield.</param>
 	/// <param name="lowerBound">Function for the lower bound of the shield.</param>
-	/// <param name="overlayShape">A shape to overlay the vertices over.</param>
 	/// <param name="resolution">Number of cells on the x-axis.</param>
 	/// <param name="depth">Depth of the shield.</param>
 	/// <param name="leftBound">
@@ -117,7 +114,7 @@ public class ShieldMeshGenerator {
 	/// Optional right margin for the shield. This is the last x value that will be evaluated.
 	/// </param>
 	/// <returns>A <see cref="SubMesh"/> with the vertices and triangles of the shield.</returns>
-	public static SubMesh GenerateCarthesian(System.Func<float, float> upperBound, System.Func<float, float> lowerBound, IOverlayShape overlayShape,
+	public static SubMesh GenerateCarthesian(System.Func<float, float> upperBound, System.Func<float, float> lowerBound,
 		int resolution, float depth,
 		float leftBound = -0.5f, float rightBound = 0.5f) {
 		var verts = new List<Vector3>();
@@ -158,7 +155,6 @@ public class ShieldMeshGenerator {
 
 		verts.AddPointTuple(oldValues);
 		verts.AddPointTuple(oldValues, depth);
-		overlayShape.Overlay(verts);
 		return new SubMesh(verts, tris);
 	}
 

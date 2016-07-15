@@ -16,12 +16,11 @@ namespace EquipmentGenerator {
 
 		/// <summary>Generate a mesh, whose triangles are looking along the overlay shape.</summary>
 		/// <param name="source">Source for the points of the perimeter.</param>
-		/// <param name="overlayShape">Shape to overlay.</param>
 		/// <param name="inside"><c>true</c> if the triangles should face inwards.</param>
 		/// <param name="depth">Depth of the perimeter.</param>
 		/// <param name="parts">Specify which parts of the perimeter should be created.</param>
 		/// <returns>A sub mesh with the generated mesh for the perimeter.</returns>
-		public static SubMesh GenerateParallel(IPointSource source, IOverlayShape overlayShape, bool inside = false, float depth = 0.1f, Parts parts = Parts.All) {
+		public static SubMesh GenerateParallel(IPointSource source, bool inside = false, float depth = 0.1f, Parts parts = Parts.All) {
 			List<Vector3> points = new List<Vector3>();
 			List<int> triangles = new List<int>();
 
@@ -83,9 +82,6 @@ namespace EquipmentGenerator {
 					triangles.AddTriangle(offsetOld + 1, offsetNew + 1, offsetNew, inside);
 				}
 			}
-
-			overlayShape.Overlay(points);
-
 			return new SubMesh(points, triangles);
 		}
 
@@ -93,12 +89,11 @@ namespace EquipmentGenerator {
 		/// Generate an outward or inward (orthogonal to the overlayshape) facing <see cref="SubMesh"/>.
 		/// </summary>
 		/// <param name="source">Source for the points.</param>
-		/// <param name="overlayShape">Shape to overlay</param>
 		/// <param name="inside">
 		/// <c>true</c> if the triangles should face outward of the cylinder, <c>false</c> otherwise.
 		/// </param>
 		/// <returns>A <see cref="SubMesh"/> with the mesh.</returns>
-		public static SubMesh GenerateOrthogonal(IPointSource source, IOverlayShape overlayShape, bool inside = false) {
+		public static SubMesh GenerateOrthogonal(IPointSource source, bool inside = false) {
 			List<Vector3> points = new List<Vector3>(source.Resolution * 2 + 1);
 			List<int> triangleIndices = new List<int>();
 
@@ -135,8 +130,6 @@ namespace EquipmentGenerator {
 
 			points.AddPoint(newValues.Value1);
 			points.AddPoint(newValues.Value2);
-
-			overlayShape.Overlay(points);
 
 			return new SubMesh(points, triangleIndices);
 		}
