@@ -72,6 +72,12 @@ namespace EquipmentGenerator {
 	public class SubMesh {
 
 		/// <summary>The vertices of this submesh.</summary>
+		public List<Vector3> Vertices { get { return _vertices; } }
+
+		/// <summary>The triangle indices of this submesh.</summary>
+		public List<int> Triangles { get { return _triangles; } }
+
+		/// <summary>The vertices of this submesh.</summary>
 		private readonly List<Vector3> _vertices;
 
 		/// <summary>The triangle indices of this submesh.</summary>
