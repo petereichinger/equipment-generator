@@ -66,36 +66,38 @@ public class ShieldMeshGenerator {
 			Vector2 oldEnd = oldValues.Value2.HasValue ? oldValues.Value2.Value : oldValues.Value1.Value;
 			bool triangle = !oldValues.Value2.HasValue || !newValues.Value2.HasValue;
 
-			for (int j = 0; j < 2 * subdivisions; j += 2) {
-				float t = j * subDivStep;
+			var subDouble = 2 * subdivisions;
+			for (int i = 0; i < subDouble; i += 2) {
+				float t = i * subDivStep;
 
 				Vector2 oldPos = Vector2.Lerp(oldStart, oldEnd, t);
 
-				if (triangle && j == 0) {
-					// Front
-					tris.AddTriangle(oldOffset, newOffset + 2, oldOffset + 2);
+				if (depth > 0 && i == 0 && !triangle) {
+					//Inside
 
-					// Back
-					tris.AddTriangle(oldOffset + 1, newOffset + 3, oldOffset + 3, true);
-				} else {
-					if (j == 0) {
-						//Inside
-
-						tris.AddTriangle(oldOffset, oldOffset + 1, newOffset + 1);
-						tris.AddTriangle(oldOffset, newOffset + 1, newOffset);
-					}
-
-					// Front
-					tris.AddTriangle(oldOffset + j, newOffset + j, newOffset + j + 2);
-					tris.AddTriangle(oldOffset + j, newOffset + j + 2, oldOffset + j + 2);
-
-					// Back
-					tris.AddTriangle(oldOffset + j + 1, newOffset + j + 1, newOffset + j + 3, true);
-					tris.AddTriangle(oldOffset + j + 1, newOffset + j + 3, oldOffset + j + 3, true);
+					tris.AddTriangle(oldOffset, oldOffset + 1, newOffset + 1);
+					tris.AddTriangle(oldOffset, newOffset + 1, newOffset);
 				}
+
+				// Front
+				if (!(triangle && i == 0)) {
+					tris.AddTriangle(oldOffset + i, newOffset + i, newOffset + i + 2);
+				}
+				tris.AddTriangle(oldOffset + i, newOffset + i + 2, oldOffset + i + 2);
+
+				// Back
+				if (!(triangle && i == 0)) {
+					tris.AddTriangle(oldOffset + i + 1, newOffset + i + 1, newOffset + i + 3, true);
+				}
+				tris.AddTriangle(oldOffset + i + 1, newOffset + i + 3, oldOffset + i + 3, true);
 
 				verts.AddPoint(oldPos);
 				verts.AddPoint(oldPos, depth);
+			}
+			// Outside
+			if (depth > 0) {
+				tris.AddTriangle(oldOffset + subDouble, newOffset + subDouble, newOffset + subDouble + 1);
+				tris.AddTriangle(oldOffset + subDouble, newOffset + subDouble + 1, oldOffset + subDouble + 1);
 			}
 			verts.AddPoint(oldEnd);
 			verts.AddPoint(oldEnd, depth);
