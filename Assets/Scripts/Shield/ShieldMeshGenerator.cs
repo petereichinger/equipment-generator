@@ -65,12 +65,13 @@ public class ShieldMeshGenerator {
 			bool triangle = !oldValues.Value2.HasValue || !newValues.Value2.HasValue;
 
 			var subDouble = 2 * subdivisions;
-			for (int i = 0; i < subDouble; i += 2) {
+			for (int i = 0; i < subdivisions; i++) {
 				float t = i * subDivStep;
+				int divOff = 2 * i;
 
 				Vector2 oldPos = Vector2.Lerp(oldStart, oldEnd, t);
 
-				if (depth > 0 && i == 0 && !triangle) {
+				if (depth > 0 && divOff == 0 && !triangle) {
 					//Inside
 
 					tris.AddTriangle(oldOffset, oldOffset + 1, newOffset + 1);
@@ -78,16 +79,16 @@ public class ShieldMeshGenerator {
 				}
 
 				// Front
-				if (!(triangle && i == 0)) {
-					tris.AddTriangle(oldOffset + i, newOffset + i, newOffset + i + 2);
+				if (!(triangle && divOff == 0)) {
+					tris.AddTriangle(oldOffset + divOff, newOffset + divOff, newOffset + divOff + 2);
 				}
-				tris.AddTriangle(oldOffset + i, newOffset + i + 2, oldOffset + i + 2);
+				tris.AddTriangle(oldOffset + divOff, newOffset + divOff + 2, oldOffset + divOff + 2);
 
 				// Back
-				if (!(triangle && i == 0)) {
-					tris.AddTriangle(oldOffset + i + 1, newOffset + i + 1, newOffset + i + 3, true);
+				if (!(triangle && divOff == 0)) {
+					tris.AddTriangle(oldOffset + divOff + 1, newOffset + divOff + 1, newOffset + divOff + 3, true);
 				}
-				tris.AddTriangle(oldOffset + i + 1, newOffset + i + 3, oldOffset + i + 3, true);
+				tris.AddTriangle(oldOffset + divOff + 1, newOffset + divOff + 3, oldOffset + divOff + 3, true);
 
 				verts.AddPoint(oldPos);
 				verts.AddPoint(oldPos, depth);
