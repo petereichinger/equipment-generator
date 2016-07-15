@@ -6,7 +6,7 @@ namespace EquipmentGenerator {
 	/// <summary>Interface for a shape to overlay vertices on</summary>
 	public interface IOverlayShape {
 
-		void Overlay(List<Vector3> points);
+		SubMesh Overlay(SubMesh mesh);
 	}
 
 	public class PyramidOverlayShape : IOverlayShape {
@@ -24,17 +24,18 @@ namespace EquipmentGenerator {
 			_offset = offset;
 		}
 
-		public void Overlay(List<Vector3> points) {
-			for (int i = 0; i < points.Count; i++) {
-				var point = points[i];
+		public SubMesh Overlay(SubMesh mesh) {
+			for (int i = 0; i < mesh.Vertices.Count; i++) {
+				var point = mesh.Vertices[i];
 				point.x -= _offset;
 
 				point.Scale(new Vector3(_scale.x, _scale.y, 1f));
 				float offsetX = Mathf.Abs(_gradient * point.x);
 				float offsetY = Mathf.Abs(_gradient * point.y);
 				point.z += Mathf.Max(offsetX, offsetY);
-				points[i] = point;
+				mesh.Vertices[i] = point;
 			}
+			return mesh;
 		}
 	}
 
@@ -54,20 +55,15 @@ namespace EquipmentGenerator {
 			_offset = offset;
 		}
 
-		/// <summary>
-		/// Modifies <paramref name="points"/> so that they are on a y-axis cylinder with the radius <see
-		/// cref="_radius"/>
-		/// </summary>
-		/// <param name="points">Points to overlay on the cylinder.</param>
-		public void Overlay(List<Vector3> points) {
+		public SubMesh Overlay(SubMesh mesh) {
 			// Scale and move points
 			if (_radius <= 0f) {
 				Debug.LogError("radius must be > 0");
-				return;
+				return mesh;
 			}
 
-			for (int i = 0; i < points.Count; i++) {
-				var point = points[i];
+			for (int i = 0; i < mesh.Vertices.Count; i++) {
+				var point = mesh.Vertices[i];
 
 				point.x -= _offset;
 
@@ -82,8 +78,9 @@ namespace EquipmentGenerator {
 					float z = -Mathf.Sqrt(sqrRadius - xPow - yPow);
 					point.z = z + _radius;
 				}
-				points[i] = point;
+				mesh.Vertices[i] = point;
 			}
+			return mesh;
 		}
 	}
 
@@ -100,14 +97,15 @@ namespace EquipmentGenerator {
 			_offset = offset;
 		}
 
-		public void Overlay(List<Vector3> points) {
-			for (int i = 0; i < points.Count; i++) {
-				var point = points[i];
+		public SubMesh Overlay(SubMesh mesh) {
+			for (int i = 0; i < mesh.Vertices.Count; i++) {
+				var point = mesh.Vertices[i];
 				point.x -= _offset;
 				point.Scale(new Vector3(_scale.x, _scale.y, 1f));
 
-				points[i] = point;
+				mesh.Vertices[i] = point;
 			}
+			return mesh;
 		}
 	}
 
@@ -127,16 +125,17 @@ namespace EquipmentGenerator {
 			_offset = offset;
 		}
 
-		public void Overlay(List<Vector3> points) {
-			for (int i = 0; i < points.Count; i++) {
-				var point = points[i];
+		public SubMesh Overlay(SubMesh mesh) {
+			for (int i = 0; i < mesh.Vertices.Count; i++) {
+				var point = mesh.Vertices[i];
 				point.x -= _offset;
 
 				point.Scale(new Vector3(_scale.x, _scale.y, 1f));
 
 				point.z += Mathf.Abs(_gradient * point.x);
-				points[i] = point;
+				mesh.Vertices[i] = point;
 			}
+			return mesh;
 		}
 	}
 
@@ -156,20 +155,15 @@ namespace EquipmentGenerator {
 			_offset = offset;
 		}
 
-		/// <summary>
-		/// Modifies <paramref name="points"/> so that they are on a y-axis cylinder with the radius <see
-		/// cref="_radius"/>
-		/// </summary>
-		/// <param name="points">Points to overlay on the cylinder.</param>
-		public void Overlay(List<Vector3> points) {
+		public SubMesh Overlay(SubMesh mesh) {
 			// Scale and move points
 			if (_radius <= 0f) {
 				Debug.LogError("radius must be > 0");
-				return;
+				return mesh;
 			}
 
-			for (int i = 0; i < points.Count; i++) {
-				var point = points[i];
+			for (int i = 0; i < mesh.Vertices.Count; i++) {
+				var point = mesh.Vertices[i];
 
 				point.x -= _offset;
 
@@ -184,8 +178,9 @@ namespace EquipmentGenerator {
 					float z = -Mathf.Sqrt(sqrRadius - pow);
 					point.z = z + _radius;
 				}
-				points[i] = point;
+				mesh.Vertices[i] = point;
 			}
+			return mesh;
 		}
 	}
 }
