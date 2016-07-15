@@ -78,6 +78,13 @@ public class ShieldMeshGenerator {
 					// Back
 					tris.AddTriangle(oldOffset + 1, newOffset + 3, oldOffset + 3, true);
 				} else {
+					if (j == 0) {
+						//Inside
+
+						tris.AddTriangle(oldOffset, oldOffset + 1, newOffset + 1);
+						tris.AddTriangle(oldOffset, newOffset + 1, newOffset);
+					}
+
 					// Front
 					tris.AddTriangle(oldOffset + j, newOffset + j, newOffset + j + 2);
 					tris.AddTriangle(oldOffset + j, newOffset + j + 2, oldOffset + j + 2);
