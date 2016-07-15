@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 
 namespace EquipmentGenerator.Shield {
@@ -24,21 +25,11 @@ namespace EquipmentGenerator.Shield {
 		public AnimationCurve curveBottom;
 
 		public void GenerateShield() {
-			var upperSource = new FunctionSource(x => curve.Evaluate(x), res);
-			var middleSource = new SquareSource(res);
-			var lowerSource = new FunctionSource(x => curveBottom.Evaluate(x), res, true);
-			var outerOverlay = new CylinderOverlayShape(radius, scale, offset);
-			var innerOverlay = new CylinderOverlayShape(radius - depth, scale, offset);
+			var overlay = new PyramidOverlayShape(1f, scale, offset);
+			// var overlay = new SphereOverlayShape(radius, scale.x, offset);
 			var subMeshes = new List<SubMesh> {
-				MeshGenerator.GenerateOrthogonal(upperSource,outerOverlay),
-				MeshGenerator.GenerateParallel(upperSource,outerOverlay,false,depth),
-				MeshGenerator.GenerateOrthogonal(upperSource, innerOverlay, true).Modify(v=>v + Vector3.forward * depth),
-				MeshGenerator.GenerateOrthogonal(middleSource,outerOverlay).Modify(v => v + Vector3.down *scale.y),
-				MeshGenerator.GenerateParallel(middleSource,outerOverlay,false,depth,MeshGenerator.Parts.LeftRight).Modify(v => v + Vector3.down *scale.y),
-				MeshGenerator.GenerateOrthogonal(middleSource,innerOverlay,true).Modify(v => v +Vector3.down * scale.y+ Vector3.forward * depth),
-				MeshGenerator.GenerateOrthogonal(lowerSource, outerOverlay).Modify(v => v + Vector3.down * scale.y * 2f),
-				MeshGenerator.GenerateParallel(lowerSource, outerOverlay,true,depth).Modify(v => v + Vector3.down * scale.y * 2f),
-				MeshGenerator.GenerateOrthogonal(lowerSource, innerOverlay,true).Modify(v => v + Vector3.down * scale.y * 2f+ Vector3.forward * depth)
+// ShieldMeshGenerator.GenerateCarthesian(x=>Mathf.Sqrt(.25f - x*x),x=>-Mathf.Sqrt(.25f - x*x),overlay,res,depth)
+ShieldMeshGenerator.GeneratePolar(x => .1f,x=> 0f,overlay,res,5, depth)
 			};
 			var mesh = SubMesh.Combine(subMeshes);
 
